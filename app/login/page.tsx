@@ -51,7 +51,7 @@ export default function LoginPage() {
       setMessage("Login successful. Redirecting...");
 
       setTimeout(() => {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }, 800);
     } catch {
       setMessage("Something went wrong. Please try again.");

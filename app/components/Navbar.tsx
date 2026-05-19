@@ -95,9 +95,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          {checkingUser ? (
-            <div className="h-10 w-32 rounded-full bg-gray-100"></div>
-          ) : user ? (
+          {user ? (
             <>
               <Link
                 href="/dashboard"

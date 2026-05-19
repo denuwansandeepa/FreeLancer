@@ -16,7 +16,7 @@ export default function FreelancerCard({
   rating,
 }: FreelancerCardProps) {
   return (
-    <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+    <div className="flex h-full flex-col rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
       <div className="flex items-center gap-4">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-emerald-500 text-xl font-bold text-white">
           {name.charAt(0)}
@@ -40,7 +40,7 @@ export default function FreelancerCard({
         ))}
       </div>
 
-      <div className="mt-5 flex items-center justify-between border-t pt-4">
+      <div className="mt-auto flex items-center justify-between border-t pt-4">
         <div>
           <p className="text-xs text-gray-500">Starting from</p>
           <p className="font-bold text-gray-900">{price}</p>

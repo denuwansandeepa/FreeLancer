@@ -1,16 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { freelancers } from "../data/siteData";
 
 export default function FreelancersPage() {
+  const [freelancers, setFreelancers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [category, setCategory] = useState("All Categories");
   const [location, setLocation] = useState("All Locations");
   const [sortBy, setSortBy] = useState("Sort by Rating");
+
+  useEffect(() => {
+    async function loadFreelancers() {
+      try {
+        const response = await fetch("/api/freelancers");
+        const data = await response.json();
+        if (data.success) {
+          setFreelancers(data.freelancers);
+        }
+      } catch (err) {
+        console.error("Error loading freelancers:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFreelancers();
+  }, []);
 
   const filteredFreelancers = useMemo(() => {
     let result = freelancers.filter((freelancer) => {
@@ -20,7 +38,7 @@ export default function FreelancersPage() {
         freelancer.name.toLowerCase().includes(searchValue) ||
         freelancer.title.toLowerCase().includes(searchValue) ||
         freelancer.category.toLowerCase().includes(searchValue) ||
-        freelancer.skills.some((skill) =>
+        freelancer.skills.some((skill: string) =>
           skill.toLowerCase().includes(searchValue)
         );
 
@@ -52,7 +70,7 @@ export default function FreelancersPage() {
     }
 
     return result;
-  }, [searchText, category, location, sortBy]);
+  }, [freelancers, searchText, category, location, sortBy]);
 
   function clearFilters() {
     setSearchText("");
@@ -153,7 +171,24 @@ export default function FreelancersPage() {
           </select>
         </div>
 
-        {filteredFreelancers.length === 0 ? (
+        {loading ? (
+          <div className="grid gap-6 lg:grid-cols-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="flex flex-col gap-5 sm:flex-row">
+                  <div className="h-20 w-20 shrink-0 rounded-3xl bg-gray-200"></div>
+                  <div className="flex-1 space-y-4 py-1">
+                    <div className="h-4 rounded bg-gray-200 w-3/4"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 rounded bg-gray-200"></div>
+                      <div className="h-4 rounded bg-gray-200 w-5/6"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredFreelancers.length === 0 ? (
           <div className="rounded-3xl bg-white p-12 text-center shadow-sm">
             <h3 className="text-2xl font-black text-gray-900">
               No freelancers found
@@ -173,14 +208,14 @@ export default function FreelancersPage() {
             {filteredFreelancers.map((freelancer) => (
               <div
                 key={freelancer.id}
-                className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="flex h-full flex-col rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                <div className="flex flex-col gap-5 sm:flex-row">
+                <div className="flex flex-1 flex-col gap-5 sm:flex-row">
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-emerald-500 text-2xl font-black text-white">
                     {freelancer.name.charAt(0)}
                   </div>
 
-                  <div className="flex-1">
+                  <div className="flex flex-1 flex-col">
                     <div className="flex flex-col justify-between gap-3 md:flex-row">
                       <div>
                         <h3 className="text-xl font-black text-gray-900">
@@ -206,8 +241,8 @@ export default function FreelancersPage() {
                       {freelancer.description}
                     </p>
 
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {freelancer.skills.map((skill) => (
+                    <div className="mb-5 mt-4 flex flex-wrap gap-2">
+                      {freelancer.skills.map((skill: string) => (
                         <span
                           key={skill}
                           className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700"
@@ -217,7 +252,8 @@ export default function FreelancersPage() {
                       ))}
                     </div>
 
-                    <div className="mt-5 flex flex-col justify-between gap-4 border-t pt-5 sm:flex-row sm:items-center">
+
+                    <div className="mt-auto flex flex-col justify-between gap-4 border-t pt-5 sm:flex-row sm:items-center">
                       <div className="flex gap-5 text-sm">
                         <span className="font-semibold text-yellow-500">
                           ⭐ {freelancer.rating}
