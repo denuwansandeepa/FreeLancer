@@ -1,8 +1,65 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("kasun@test.com");
+  const [password, setPassword] = useState("123456");
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setMessage("");
+
+    if (!email || !password) {
+      setMessage("Please enter email and password.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Login failed.");
+        return;
+      }
+
+      localStorage.setItem("skillLankaUser", JSON.stringify(data.user));
+
+      setMessage("Login successful. Redirecting...");
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 800);
+    } catch {
+      setMessage("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
       <Navbar />
@@ -46,7 +103,19 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form className="space-y-5">
+            {message && (
+              <div
+                className={`mb-5 rounded-2xl p-4 text-sm font-semibold ${
+                  message.includes("successful")
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "bg-red-50 text-red-700"
+                }`}
+              >
+                {message}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-5">
               <div>
                 <label className="mb-2 block text-sm font-bold text-gray-700">
                   Email Address
@@ -54,7 +123,9 @@ export default function LoginPage() {
                 <input
                   type="email"
                   placeholder="example@email.com"
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 />
               </div>
 
@@ -65,7 +136,9 @@ export default function LoginPage() {
                 <input
                   type="password"
                   placeholder="Enter your password"
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 />
               </div>
 
@@ -81,10 +154,11 @@ export default function LoginPage() {
               </div>
 
               <button
-                type="button"
-                className="w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700"
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
               >
-                Login
+                {loading ? "Logging in..." : "Login"}
               </button>
             </form>
 

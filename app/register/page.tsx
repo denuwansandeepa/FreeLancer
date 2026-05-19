@@ -1,8 +1,86 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function RegisterPage() {
+  const router = useRouter();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("CLIENT");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+
+  async function handleRegister(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setMessage("");
+    setIsError(false);
+
+    if (!name || !email || !password || !confirmPassword) {
+      setIsError(true);
+      setMessage("Please fill all required fields.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setIsError(true);
+      setMessage("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setIsError(true);
+      setMessage("Passwords do not match.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setIsError(true);
+        setMessage(data.message || "Registration failed.");
+        return;
+      }
+
+      setIsError(false);
+      setMessage("Account created successfully. Redirecting to login...");
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 1200);
+    } catch {
+      setIsError(true);
+      setMessage("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
       <Navbar />
@@ -19,7 +97,19 @@ export default function RegisterPage() {
               </p>
             </div>
 
-            <form className="space-y-5">
+            {message && (
+              <div
+                className={`mb-5 rounded-2xl p-4 text-sm font-semibold ${
+                  isError
+                    ? "bg-red-50 text-red-700"
+                    : "bg-emerald-50 text-emerald-700"
+                }`}
+              >
+                {message}
+              </div>
+            )}
+
+            <form onSubmit={handleRegister} className="space-y-5">
               <div>
                 <label className="mb-2 block text-sm font-bold text-gray-700">
                   Full Name
@@ -27,7 +117,9 @@ export default function RegisterPage() {
                 <input
                   type="text"
                   placeholder="Enter your full name"
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 />
               </div>
 
@@ -38,7 +130,9 @@ export default function RegisterPage() {
                 <input
                   type="email"
                   placeholder="example@email.com"
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 />
               </div>
 
@@ -46,9 +140,15 @@ export default function RegisterPage() {
                 <label className="mb-2 block text-sm font-bold text-gray-700">
                   Account Type
                 </label>
-                <select className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                  <option>I want to hire freelancers</option>
-                  <option>I want to work as a freelancer</option>
+                <select
+                  value={role}
+                  onChange={(event) => setRole(event.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                >
+                  <option value="CLIENT">I want to hire freelancers</option>
+                  <option value="FREELANCER">
+                    I want to work as a freelancer
+                  </option>
                 </select>
               </div>
 
@@ -59,7 +159,9 @@ export default function RegisterPage() {
                 <input
                   type="password"
                   placeholder="Create a password"
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 />
               </div>
 
@@ -70,15 +172,18 @@ export default function RegisterPage() {
                 <input
                   type="password"
                   placeholder="Confirm your password"
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 />
               </div>
 
               <button
-                type="button"
-                className="w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700"
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
               >
-                Create Account
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
 
