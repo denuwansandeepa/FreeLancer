@@ -117,10 +117,10 @@ export default function JobsPage() {
             <input
               type="text"
               placeholder="Search services..."
-              className="rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500 md:col-span-2"
+              className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 md:col-span-2"
             />
 
-            <select className="rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500">
+            <select className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none focus:border-blue-500">
               <option>All Categories</option>
               <option>Web Development</option>
               <option>Graphic Design</option>
@@ -129,7 +129,7 @@ export default function JobsPage() {
               <option>Writing</option>
             </select>
 
-            <select className="rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500">
+            <select className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none focus:border-blue-500">
               <option>All Locations</option>
               <option>Colombo</option>
               <option>Kandy</option>
@@ -156,7 +156,7 @@ export default function JobsPage() {
             </p>
           </div>
 
-          <select className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none">
+          <select className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none">
             <option>Sort by Best Rating</option>
             <option>Lowest Price</option>
             <option>Fastest Delivery</option>

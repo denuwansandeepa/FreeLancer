@@ -38,128 +38,139 @@ export default function PostJobPage() {
             Add clear details so freelancers can understand your work properly.
           </p>
 
-          {submitted && (
-            <div className="mt-6 rounded-2xl bg-emerald-50 p-5 font-semibold text-emerald-700">
-              ✅ Job request submitted successfully. Later we will connect this
-              to the database.
+          {submitted ? (
+            <div className="mt-6 rounded-2xl bg-emerald-50 p-5 font-semibold text-emerald-700 text-center">
+              ✅ Job request submitted successfully.
             </div>
-          )}
-
-          <form className="mt-8 space-y-6">
-            <div>
-              <label className="mb-2 block text-sm font-bold text-gray-700">
-                Job Title
-              </label>
-              <input
-                type="text"
-                placeholder="Example: I need a website for my shop"
-                className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-bold text-gray-700">
-                Category
-              </label>
-              <select className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                <option>Select category</option>
-                <option>Web Development</option>
-                <option>Graphic Design</option>
-                <option>Digital Marketing</option>
-                <option>Video Editing</option>
-                <option>Writing</option>
-                <option>App Development</option>
-                <option>Local Services</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-bold text-gray-700">
-                Project Description
-              </label>
-              <textarea
-                rows={7}
-                placeholder="Explain what you need, your business type, required features, and expected result..."
-                className="w-full resize-none rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              ></textarea>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-bold text-gray-700">
-                  Budget
-                </label>
-                <input
-                  type="text"
-                  placeholder="Example: Rs. 25,000"
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-bold text-gray-700">
-                  Deadline
-                </label>
-                <input
-                  type="text"
-                  placeholder="Example: Within 7 days"
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-bold text-gray-700">
-                  Location
-                </label>
-                <select className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                  <option>Any location</option>
-                  <option>Colombo</option>
-                  <option>Kandy</option>
-                  <option>Gampaha</option>
-                  <option>Galle</option>
-                  <option>Kurunegala</option>
-                  <option>Jaffna</option>
-                  <option>Remote only</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-bold text-gray-700">
-                  Contact Method
-                </label>
-                <select className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                  <option>Website message</option>
-                  <option>WhatsApp</option>
-                  <option>Email</option>
-                  <option>Phone call</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-bold text-gray-700">
-                Required Skills
-              </label>
-              <input
-                type="text"
-                placeholder="Example: Next.js, Logo Design, Facebook Ads"
-                className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              />
-              <p className="mt-2 text-sm text-gray-500">
-                Separate skills using commas.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setSubmitted(true)}
-              className="w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700"
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSubmitted(true);
+              }}
+              className="mt-8 space-y-6"
             >
-              Submit Job Request
-            </button>
-          </form>
+              <div>
+                <label className="mb-2 block text-sm font-bold text-gray-700">
+                  Job Title
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Example: I need a website for my shop"
+                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-bold text-gray-700">
+                  Category
+                </label>
+                <select
+                  required
+                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400"
+                >
+                  <option value="">Select category</option>
+                  <option>Web Development</option>
+                  <option>Graphic Design</option>
+                  <option>Digital Marketing</option>
+                  <option>Video Editing</option>
+                  <option>Writing</option>
+                  <option>App Development</option>
+                  <option>Local Services</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-bold text-gray-700 text-gray-900 placeholder-gray-400">
+                  Project Description
+                </label>
+                <textarea
+                  rows={7}
+                  required
+                  placeholder="Explain what you need, your business type, required features, and expected result..."
+                  className="w-full resize-none rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400"
+                ></textarea>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-gray-700">
+                    Budget
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Example: Rs. 25,000"
+                    className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-gray-700">
+                    Deadline
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Example: Within 7 days"
+                    className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-gray-700">
+                    Location
+                  </label>
+                  <select className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400">
+                    <option>Any location</option>
+                    <option>Colombo</option>
+                    <option>Kandy</option>
+                    <option>Gampaha</option>
+                    <option>Galle</option>
+                    <option>Kurunegala</option>
+                    <option>Jaffna</option>
+                    <option>Remote only</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-gray-700">
+                    Contact Method
+                  </label>
+                  <select className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400">
+                    <option>Website message</option>
+                    <option>WhatsApp</option>
+                    <option>Email</option>
+                    <option>Phone call</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-bold text-gray-700">
+                  Required Skills
+                </label>
+                <input
+                  type="text"
+                  placeholder="Example: Next.js, Logo Design, Facebook Ads"
+                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-gray-900 placeholder-gray-400"
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                  Separate skills using commas.
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700 text-gray-900 placeholder-gray-400"
+              >
+                Submit Job Request
+              </button>
+            </form>
+          )}
         </div>
 
         <aside className="space-y-8">
