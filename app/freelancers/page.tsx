@@ -90,13 +90,13 @@ export default function FreelancersPage() {
               placeholder="Search skill, name, or title..."
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              className="rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500"
+              className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500"
             />
 
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500"
+              className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none focus:border-blue-500"
             >
               <option>All Categories</option>
               <option>Web Development</option>
@@ -110,7 +110,7 @@ export default function FreelancersPage() {
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-500"
+              className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none focus:border-blue-500"
             >
               <option>All Locations</option>
               <option>Colombo</option>
@@ -145,7 +145,7 @@ export default function FreelancersPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none"
+            className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none"
           >
             <option>Sort by Rating</option>
             <option>Lowest Price</option>

@@ -103,7 +103,7 @@ export default function Navbar() {
                 href="/dashboard"
                 className="hidden rounded-full bg-blue-50 px-5 py-2 text-sm font-bold text-blue-700 hover:bg-blue-100 sm:block"
               >
-                Hi, {user.name.split(" ")[0]}
+               Hi, {user.name.split(" ")[0]} ({user.role === "FREELANCER" ? "Freelancer" : "Client"})
               </Link>
 
               <button
