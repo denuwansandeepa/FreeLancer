@@ -92,7 +92,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white">
-      <div className="mx-auto flex max-w`-7xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w`-8xl items-center justify-between px-6 py-4">
         <Link href="/" className="text-2xl font-black text-gray-900">
           Skill<span className="text-blue-600">Lanka</span>
         </Link>

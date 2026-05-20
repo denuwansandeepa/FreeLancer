@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <footer className="mt-20 bg-gray-950 px-6 py-10 text-white animate-fade-in ">
-      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-3">
+      <div className="mx-auto grid max-w-8xl gap-8 md:grid-cols-3">
         <div>
           <h2 className="text-2xl font-black">
             Skill<span className="text-blue-400">Lanka</span>
