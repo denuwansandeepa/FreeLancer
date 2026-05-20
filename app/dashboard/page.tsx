@@ -1,8 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import StatsGrid from "./_components/StatsGrid";
+import FreelancerView from "./_components/freelancerView/FreelancerView";
+import ClientView from "./_components/clientView/ClientView";
+import QuickActions from "./_components/QuickActions";
 
 type LoggedInUser = {
   id: string;
@@ -12,75 +15,6 @@ type LoggedInUser = {
   phone?: string | null;
   location?: string | null;
 };
-
-const stats = [
-  {
-    title: "Profile Views",
-    value: "248",
-    change: "+18 this week",
-    icon: "👀",
-  },
-  {
-    title: "Hire Requests",
-    value: "12",
-    change: "4 new requests",
-    icon: "📩",
-  },
-  {
-    title: "Active Services",
-    value: "5",
-    change: "2 featured",
-    icon: "💼",
-  },
-  {
-    title: "Completed Jobs",
-    value: "42",
-    change: "4.9 rating",
-    icon: "✅",
-  },
-];
-
-const hireRequests = [
-  {
-    client: "Saman Enterprises",
-    service: "Business Website Development",
-    budget: "Rs. 35,000",
-    status: "New",
-  },
-  {
-    client: "Nethmi Fashion",
-    service: "Social Media Post Design",
-    budget: "Rs. 8,000",
-    status: "Pending",
-  },
-  {
-    client: "Galle Food Corner",
-    service: "Facebook Page Management",
-    budget: "Rs. 20,000",
-    status: "Accepted",
-  },
-];
-
-const services = [
-  {
-    title: "Modern Business Website",
-    price: "Rs. 25,000",
-    orders: 32,
-    status: "Active",
-  },
-  {
-    title: "Admin Dashboard Development",
-    price: "Rs. 45,000",
-    orders: 11,
-    status: "Active",
-  },
-  {
-    title: "Portfolio Website Design",
-    price: "Rs. 15,000",
-    orders: 18,
-    status: "Draft",
-  },
-];
 
 const activities = [
   "New hire request received from Saman Enterprises",
@@ -94,9 +28,11 @@ export default function DashboardPage() {
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // --- ADD STATES FOR REALTIME DATA ---
+  const [dbData, setDbData] = useState<any>(null);
+
   useEffect(() => {
     const savedUser = localStorage.getItem("skillLankaUser");
-
     if (!savedUser) {
       router.push("/login");
       return;
@@ -105,6 +41,15 @@ export default function DashboardPage() {
     try {
       const parsedUser = JSON.parse(savedUser);
       setUser(parsedUser);
+
+      // Fetch DB stats & lists
+      fetch("/api/dashboard")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setDbData(data);
+          }
+        });
     } catch {
       localStorage.removeItem("skillLankaUser");
       router.push("/login");
@@ -136,13 +81,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
     <main className="min-h-screen bg-gray-50 animate-fade-in">
-
+      {/* Header Section */}
       <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 inline-block rounded-full bg-white/10 px-5 py-2 text-sm font-semibold">
-            {user.role === "FREELANCER" ? "Freelancer Dashboard" : "Client Dashboard"}
+            {user.role === "FREELANCER"
+              ? "Freelancer Dashboard"
+              : "Client Dashboard"}
           </p>
 
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
@@ -175,7 +121,7 @@ export default function DashboardPage() {
 
             <button
               onClick={handleLogout}
-              className="rounded-full bg-white px-6 py-4 text-center font-bold text-gray-900 hover:bg-blue-50"
+              className="rounded-full bg-white px-6 py-4 text-center font-bold text-gray-900 hover:bg-blue-50 cursor-pointer"
             >
               Logout
             </button>
@@ -184,133 +130,24 @@ export default function DashboardPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-10">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((item) => (
-            <div
-              key={item.title}
-              className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-3xl">
-                  {item.icon}
-                </div>
-
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-                  {item.change}
-                </span>
-              </div>
-
-              <p className="mt-5 text-sm font-semibold text-gray-500">
-                {item.title}
-              </p>
-              <h2 className="mt-1 text-3xl font-black text-gray-900">
-                {item.value}
-              </h2>
-            </div>
-          ))}
-        </div>
+        {/* Dynamic Statistics Cards - Pass dbData stats if loaded */}
+        <StatsGrid role={user.role} stats={dbData?.stats} />
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-8 px-6 pb-20 lg:grid-cols-[1.5fr_1fr]">
-        <div className="space-y-8">
-          <div className="rounded-3xl bg-white p-8 shadow-sm">
-            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-              <div>
-                <h2 className="text-2xl font-black text-gray-900">
-                  Hire Requests
-                </h2>
-                <p className="mt-1 text-gray-600">
-                  Review clients who want to hire you.
-                </p>
-              </div>
+        {/* Left Column Content (Role-Specific) - Pass dbData variables if loaded */}
+        {user.role === "FREELANCER" ? (
+          <FreelancerView
+            hireRequests={dbData?.hireRequests}
+            services={dbData?.services}
+          />
+        ) : (
+          <ClientView postedJobs={dbData?.postedJobs} />
+        )}
 
-              <button className="rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700">
-                View All
-              </button>
-            </div>
-
-            <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-600">
-                  <tr>
-                    <th className="px-5 py-4">Client</th>
-                    <th className="px-5 py-4">Service</th>
-                    <th className="px-5 py-4">Budget</th>
-                    <th className="px-5 py-4">Status</th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-200">
-                  {hireRequests.map((request) => (
-                    <tr key={request.client} className="bg-white">
-                      <td className="px-5 py-4 font-bold text-gray-900">
-                        {request.client}
-                      </td>
-                      <td className="px-5 py-4 text-gray-600">
-                        {request.service}
-                      </td>
-                      <td className="px-5 py-4 font-bold text-gray-900">
-                        {request.budget}
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-                          {request.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="rounded-3xl bg-white p-8 shadow-sm">
-            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-              <div>
-                <h2 className="text-2xl font-black text-gray-900">
-                  My Services
-                </h2>
-                <p className="mt-1 text-gray-600">
-                  Manage services you offer to clients.
-                </p>
-              </div>
-
-              <button className="rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white hover:bg-blue-600">
-                Add New Service
-              </button>
-            </div>
-
-            <div className="mt-6 grid gap-4">
-              {services.map((service) => (
-                <div
-                  key={service.title}
-                  className="flex flex-col justify-between gap-4 rounded-2xl border border-gray-200 bg-gray-50 p-5 md:flex-row md:items-center"
-                >
-                  <div>
-                    <h3 className="font-black text-gray-900">
-                      {service.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-600">
-                      {service.orders} orders · Starting from {service.price}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-gray-700">
-                      {service.status}
-                    </span>
-
-                    <button className="rounded-full border border-gray-300 px-5 py-2 text-sm font-bold text-gray-700 hover:bg-white">
-                      Edit
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
+        {/* Right Column Content (Sidebar) */}
         <aside className="space-y-8">
+          {/* Account Details */}
           <div className="rounded-3xl bg-white p-8 shadow-sm">
             <h2 className="text-2xl font-black text-gray-900">
               My Account Details
@@ -348,6 +185,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Profile Completion */}
           <div className="rounded-3xl bg-white p-8 shadow-sm">
             <h2 className="text-2xl font-black text-gray-900">
               Profile Completion
@@ -372,33 +210,15 @@ export default function DashboardPage() {
               <p>⚠️ Add portfolio details</p>
             </div>
 
-            <button className="mt-6 w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white hover:bg-blue-700">
+            <button className="mt-6 w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white hover:bg-blue-700 cursor-pointer">
               Improve Profile
             </button>
           </div>
 
-          <div className="rounded-3xl bg-gray-900 p-8 text-white shadow-sm">
-            <h2 className="text-2xl font-black">Quick Actions</h2>
+          {/* Quick Actions (Role-Specific) */}
+          <QuickActions role={user.role} />
 
-            <div className="mt-6 grid gap-3">
-              <button className="rounded-2xl bg-white px-5 py-4 text-left font-bold text-gray-900 hover:bg-blue-50">
-                ➕ Add New Service
-              </button>
-
-              <button className="rounded-2xl bg-white/10 px-5 py-4 text-left font-bold text-white hover:bg-white/15">
-                ✏️ Edit Profile
-              </button>
-
-              <button className="rounded-2xl bg-white/10 px-5 py-4 text-left font-bold text-white hover:bg-white/15">
-                📩 View Messages
-              </button>
-
-              <button className="rounded-2xl bg-white/10 px-5 py-4 text-left font-bold text-white hover:bg-white/15">
-                📊 View Analytics
-              </button>
-            </div>
-          </div>
-
+          {/* Recent Activity */}
           <div className="rounded-3xl bg-white p-8 shadow-sm">
             <h2 className="text-2xl font-black text-gray-900">
               Recent Activity
@@ -408,17 +228,13 @@ export default function DashboardPage() {
               {activities.map((activity) => (
                 <div key={activity} className="flex gap-3">
                   <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-blue-600"></div>
-                  <p className="text-sm leading-6 text-gray-600">
-                    {activity}
-                  </p>
+                  <p className="text-sm leading-6 text-gray-600">{activity}</p>
                 </div>
               ))}
             </div>
           </div>
         </aside>
       </section>
-
     </main>
-</>
   );
 }

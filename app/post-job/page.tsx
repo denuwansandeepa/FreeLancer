@@ -1,10 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import Footer from "../components/Footer";
 
 export default function PostJobPage() {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
@@ -17,6 +19,23 @@ export default function PostJobPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("skillLankaUser");
+    if (!savedUser) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const user = JSON.parse(savedUser);
+      if (user.role !== "CLIENT") {
+        router.push("/dashboard");
+      }
+    } catch {
+      router.push("/login");
+    }
+  }, [router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

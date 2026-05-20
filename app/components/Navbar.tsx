@@ -23,6 +23,8 @@ export default function Navbar() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   // Tracks which navigation link the user clicked (e.g., "Post Job" or "Dashboard")
   const [modalTarget, setModalTarget] = useState<string>("");
+  // State to control visibility of the "Client Role Required" modal
+  const [showRoleModal, setShowRoleModal] = useState(false);
 
   useEffect(() => {
     async function checkLoginUser() {
@@ -87,6 +89,13 @@ export default function Navbar() {
       e.preventDefault(); // Stop the default navigation behavior
       setModalTarget(label); // Store the page title to display in the modal
       setShowLoginModal(true); // Display the custom modal alert
+      return;
+    }
+
+    // If logged in user is a freelancer, block posting jobs
+    if (user && user.role !== "CLIENT" && label === "Post Job") {
+      e.preventDefault();
+      setShowRoleModal(true);
     }
   }
 
@@ -259,6 +268,76 @@ export default function Navbar() {
               >
                 Create Account
               </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRoleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setShowRoleModal(false)}
+          />
+
+          {/* Modal Card */}
+          <div className="relative z-10 w-full max-w-md transform overflow-hidden rounded-3xl bg-white p-8 text-left shadow-2xl transition-all duration-300 border border-gray-100">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowRoleModal(false)}
+              className="absolute right-5 top-5 rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors cursor-pointer"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Icon Banner */}
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 mb-6">
+              <svg
+                className="h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+
+            {/* Title & Desc */}
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-black text-gray-900">
+                Client Role Required
+              </h3>
+              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                Only <span className="font-bold text-blue-600">Client</span> accounts can post job requests. Freelancers can apply to jobs but cannot post them.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => setShowRoleModal(false)}
+                className="w-full rounded-2xl bg-gray-900 py-3.5 text-center text-sm font-bold text-white hover:bg-gray-800 transition-all duration-200 cursor-pointer"
+              >
+                Got it
+              </button>
             </div>
           </div>
         </div>

@@ -54,6 +54,16 @@ export async function POST(request: Request) {
 
     const user = await verifyToken(token);
 
+    if (user.role !== "CLIENT") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Forbidden: Only clients are allowed to post job requests.",
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
 
     const {
