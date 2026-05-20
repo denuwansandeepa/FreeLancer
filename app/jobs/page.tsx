@@ -1,6 +1,4 @@
 import Link from "next/link";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 const services = [
   {
@@ -92,9 +90,8 @@ const services = [
 export default function JobsPage() {
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
 
-      <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-500 px-6 py-20 text-white">
+      <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-500 px-6 py-20 text-white animate-fade-in">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 inline-block rounded-full bg-white/15 px-5 py-2 text-sm font-semibold">
             Browse Sri Lankan Services
@@ -111,7 +108,7 @@ export default function JobsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-10">
+      <section className="mx-auto max-w-7xl px-6 py-10 animate-fade-in">
         <div className="rounded-3xl bg-white p-5 shadow-sm">
           <div className="grid gap-4 md:grid-cols-5">
             <input
@@ -262,7 +259,6 @@ export default function JobsPage() {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }

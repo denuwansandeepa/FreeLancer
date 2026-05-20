@@ -1,17 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 export default function PostJobPage() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
 
-      <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
+      <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white animate-fade-in">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 inline-block rounded-full bg-white/10 px-5 py-2 text-sm font-semibold">
             Post a Job Request
@@ -200,7 +197,6 @@ export default function PostJobPage() {
         </aside>
       </section>
 
-      <Footer />
     </main>
   );
 }

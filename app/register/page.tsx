@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -83,9 +81,8 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
 
-      <section className="flex min-h-[80vh] items-center justify-center px-6 py-16">
+      <section className="flex min-h-[80vh] items-center justify-center px-6 py-16 animate-fade-in">
         <div className="grid w-full max-w-6xl overflow-hidden rounded-[2rem] bg-white shadow-xl lg:grid-cols-2">
           <div className="p-8 sm:p-12">
             <div className="mb-8">
@@ -224,7 +221,6 @@ export default function RegisterPage() {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }

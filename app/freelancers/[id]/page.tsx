@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
 import { prisma } from "../../../lib/prisma";
 
 type PageProps = {
@@ -68,7 +66,6 @@ export default async function FreelancerProfilePage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
 
       <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
@@ -258,7 +255,7 @@ export default async function FreelancerProfilePage({ params }: PageProps) {
         </aside>
       </section>
 
-      <Footer />
+
     </main>
   );
 }

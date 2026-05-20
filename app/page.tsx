@@ -1,5 +1,3 @@
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
 import CategoryCard from "./components/CategoryGrid";
 import FreelancerCard from "./components/FreelancerCard";
@@ -68,9 +66,8 @@ export default async function Home() {
   }));
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-500 px-6 py-24 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-500 px-6 py-24 text-white animate-fade-in">
         <div className="absolute left-10 top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
         <div className="absolute bottom-10 right-10 h-40 w-40 rounded-full bg-yellow-300/20 blur-3xl"></div>
 
@@ -179,7 +176,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <Footer />
+
     </main>
   );
 }

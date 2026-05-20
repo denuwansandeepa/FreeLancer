@@ -2,8 +2,6 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 export default function FreelancersPage() {
   const [freelancers, setFreelancers] = useState<any[]>([]);
@@ -81,9 +79,8 @@ export default function FreelancersPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
 
-      <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-20 text-white">
+      <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-20 text-white animate-fade-in">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 inline-block rounded-full bg-white/10 px-5 py-2 text-sm font-semibold">
             Find Skilled Sri Lankan Talent
@@ -278,7 +275,6 @@ export default function FreelancersPage() {
         )}
       </section>
 
-      <Footer />
     </main>
   );
 }
