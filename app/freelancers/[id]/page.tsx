@@ -1,146 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-
-const freelancers = [
-  {
-    id: "kasun-perera",
-    name: "Kasun Perera",
-    title: "Full Stack Developer",
-    location: "Colombo",
-    category: "Web Development",
-    skills: ["Next.js", "React", "MySQL", "Tailwind", "Node.js"],
-    price: "Rs. 15,000",
-    rating: "4.9",
-    completedJobs: 42,
-    experience: "3 Years",
-    responseTime: "Within 2 hours",
-    description:
-      "I build modern websites, business systems, dashboards, and responsive web applications for Sri Lankan businesses. I can create clean, fast, and mobile-friendly websites using Next.js and Tailwind CSS.",
-    services: [
-      "Business website development",
-      "Portfolio website development",
-      "Admin dashboard development",
-      "Database connected web apps",
-    ],
-    portfolio: [
-      "Restaurant website",
-      "Online booking system",
-      "Small business dashboard",
-    ],
-  },
-  {
-    id: "nimali-silva",
-    name: "Nimali Silva",
-    title: "Graphic Designer",
-    location: "Kandy",
-    category: "Graphic Design",
-    skills: ["Logo Design", "Canva", "Photoshop", "Branding"],
-    price: "Rs. 5,000",
-    rating: "4.8",
-    completedJobs: 35,
-    experience: "4 Years",
-    responseTime: "Within 1 hour",
-    description:
-      "I design logos, posters, social media posts, flyers, business cards, and brand identity designs for small businesses and online shops.",
-    services: [
-      "Logo design",
-      "Social media post design",
-      "Flyer and poster design",
-      "Business card design",
-    ],
-    portfolio: ["Cafe logo", "Clothing brand poster", "Facebook ad design"],
-  },
-  {
-    id: "ruwan-fernando",
-    name: "Ruwan Fernando",
-    title: "Social Media Manager",
-    location: "Gampaha",
-    category: "Digital Marketing",
-    skills: ["Facebook Ads", "Content Creation", "Marketing"],
-    price: "Rs. 20,000",
-    rating: "4.7",
-    completedJobs: 28,
-    experience: "2 Years",
-    responseTime: "Within 3 hours",
-    description:
-      "I help businesses grow online using Facebook ads, content planning, page management, and campaign strategy.",
-    services: [
-      "Facebook page management",
-      "Ad campaign setup",
-      "Content calendar planning",
-      "Monthly social media handling",
-    ],
-    portfolio: ["Salon page growth", "Gift shop campaign", "Restaurant ads"],
-  },
-  {
-    id: "shani-jayasinghe",
-    name: "Shani Jayasinghe",
-    title: "Video Editor",
-    location: "Galle",
-    category: "Video Editing",
-    skills: ["Reels", "YouTube", "CapCut", "Premiere Pro"],
-    price: "Rs. 8,000",
-    rating: "4.9",
-    completedJobs: 51,
-    experience: "3 Years",
-    responseTime: "Within 2 hours",
-    description:
-      "I edit short videos, reels, TikToks, YouTube videos, and business promotional videos with smooth transitions and clean captions.",
-    services: [
-      "Facebook reel editing",
-      "YouTube video editing",
-      "TikTok video editing",
-      "Business promo video editing",
-    ],
-    portfolio: ["Travel reel", "Product video", "YouTube vlog edit"],
-  },
-  {
-    id: "tharindu-lakmal",
-    name: "Tharindu Lakmal",
-    title: "CV Writer",
-    location: "Kurunegala",
-    category: "Writing",
-    skills: ["CV Writing", "Cover Letters", "LinkedIn"],
-    price: "Rs. 3,000",
-    rating: "4.6",
-    completedJobs: 19,
-    experience: "2 Years",
-    responseTime: "Within 4 hours",
-    description:
-      "I write professional CVs, cover letters, LinkedIn summaries, and job application documents for Sri Lankan and overseas job seekers.",
-    services: [
-      "Professional CV writing",
-      "Cover letter writing",
-      "LinkedIn profile writing",
-      "Job application document editing",
-    ],
-    portfolio: ["IT CV", "Marketing CV", "Fresher CV"],
-  },
-  {
-    id: "mohamed-fazil",
-    name: "Mohamed Fazil",
-    title: "Mobile App Developer",
-    location: "Jaffna",
-    category: "App Development",
-    skills: ["Flutter", "Firebase", "UI Design"],
-    price: "Rs. 30,000",
-    rating: "4.8",
-    completedJobs: 23,
-    experience: "3 Years",
-    responseTime: "Within 2 hours",
-    description:
-      "I create mobile apps for shops, delivery services, schools, booking systems, and business management systems.",
-    services: [
-      "Android app development",
-      "Flutter mobile apps",
-      "Firebase connected apps",
-      "Business app development",
-    ],
-    portfolio: ["Delivery app", "School app", "Shop ordering app"],
-  },
-];
+import { prisma } from "../../../lib/prisma";
 
 type PageProps = {
   params: Promise<{
@@ -151,15 +11,61 @@ type PageProps = {
 export default async function FreelancerProfilePage({ params }: PageProps) {
   const { id } = await params;
 
-  const freelancer = freelancers.find((person) => person.id === id);
+  const profile = await prisma.freelancerProfile.findUnique({
+    where: { id },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+          location: true,
+          image: true,
+          receivedReviews: true,
+          receivedHireRequests: {
+            where: {
+              status: "COMPLETED",
+            },
+          },
+        },
+      },
+      services: true,
+    },
+  });
 
-  if (!freelancer) {
+  if (!profile) {
     notFound();
   }
 
+  const reviews = profile.user.receivedReviews;
+  const avgRating =
+    reviews.length > 0
+      ? (
+          reviews.reduce((acc, curr) => acc + curr.rating, 0) /
+          reviews.length
+        ).toFixed(1)
+      : "5.0";
+
+  const completedJobsCount = profile.user.receivedHireRequests.length;
+
+  const freelancer = {
+    id: profile.id,
+    name: profile.user.name,
+    title: profile.title,
+    location: profile.location,
+    category: profile.category,
+    skills: profile.skills ? profile.skills.split(",").map((s) => s.trim()) : [],
+    price: profile.startingPrice || "Negotiable",
+    rating: avgRating,
+    completedJobs: completedJobsCount,
+    experience: profile.experience || "Not specified",
+    responseTime: profile.responseTime || "N/A",
+    description: profile.bio,
+    services: profile.services.map((s) => s.title),
+    portfolio: ["Project A", "Project B", "Project C"],
+  };
+
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
 
       <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
@@ -349,7 +255,7 @@ export default async function FreelancerProfilePage({ params }: PageProps) {
         </aside>
       </section>
 
-      <Footer />
+
     </main>
   );
 }

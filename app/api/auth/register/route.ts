@@ -46,6 +46,8 @@ export async function POST(request: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const isFreelancer = role === "FREELANCER";
+
     const newUser = await prisma.user.create({
       data: {
         name,
@@ -54,6 +56,19 @@ export async function POST(request: Request) {
         role: role || "CLIENT",
         phone: phone || null,
         location: location || null,
+        ...(isFreelancer && {
+          freelancerProfile: {
+            create: {
+              title: "New Freelancer",
+              bio: `Hi, I am ${name}. I am ready to work.`,
+              category: "Other",
+              location: location || "Sri Lanka",
+              skills: "Not specified",
+              startingPrice: "Negotiable",
+              experience: "New",
+            },
+          },
+        }),
       },
       select: {
         id: true,

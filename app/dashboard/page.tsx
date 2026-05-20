@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 type LoggedInUser = {
   id: string;
@@ -123,14 +121,12 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <Navbar />
         <section className="flex min-h-[70vh] items-center justify-center">
           <div className="rounded-3xl bg-white p-8 text-center shadow-sm">
             <h1 className="text-2xl font-black text-gray-900">Loading...</h1>
             <p className="mt-2 text-gray-600">Checking your login details.</p>
           </div>
         </section>
-        <Footer />
       </main>
     );
   }
@@ -140,8 +136,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Navbar />
+    <>
+    <main className="min-h-screen bg-gray-50 animate-fade-in">
 
       <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
@@ -422,7 +418,7 @@ export default function DashboardPage() {
         </aside>
       </section>
 
-      <Footer />
     </main>
+</>
   );
 }

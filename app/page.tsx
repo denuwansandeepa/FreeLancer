@@ -1,17 +1,73 @@
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
 import CategoryCard from "./components/CategoryGrid";
 import FreelancerCard from "./components/FreelancerCard";
 import ServiceCard from "./components/ServiceCard";
-import { categories, freelancers, services } from "./data/siteData";
+import { categories } from "./data/siteData";
+import { prisma } from "../lib/prisma";
 
-export default function Home() {
+export default async function Home() {
+  const profiles = await prisma.freelancerProfile.findMany({
+    take: 3,
+    include: {
+      user: {
+        select: {
+          name: true,
+          receivedReviews: {
+            select: {
+              rating: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const dbFreelancers = profiles.map((profile) => {
+    const reviews = profile.user.receivedReviews;
+    const avgRating =
+      reviews.length > 0
+        ? (
+            reviews.reduce((acc, curr) => acc + curr.rating, 0) /
+            reviews.length
+          ).toFixed(1)
+        : "5.0";
+    return {
+      id: profile.id,
+      name: profile.user.name,
+      title: profile.title,
+      location: profile.location,
+      skills: profile.skills ? profile.skills.split(",").map((s) => s.trim()) : [],
+      price: profile.startingPrice || "Negotiable",
+      rating: avgRating,
+    };
+  });
+
+  const dbServices = await prisma.service.findMany({
+    take: 3,
+    include: {
+      freelancerProfile: {
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const formattedServices = dbServices.map((service) => ({
+    id: service.id,
+    title: service.title,
+    category: service.category,
+    price: service.price,
+    seller: service.freelancerProfile.user.name,
+  }));
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar />
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-500 px-6 py-24 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-500 px-6 py-24 text-white animate-fade-in">
         <div className="absolute left-10 top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
         <div className="absolute bottom-10 right-10 h-40 w-40 rounded-full bg-yellow-300/20 blur-3xl"></div>
 
@@ -71,7 +127,7 @@ export default function Home() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {freelancers.slice(0, 3).map((freelancer) => (
+            {dbFreelancers.map((freelancer) => (
               <FreelancerCard key={freelancer.id} {...freelancer} />
             ))}
           </div>
@@ -89,13 +145,13 @@ export default function Home() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {services.slice(0, 3).map((service) => (
+          {formattedServices.map((service) => (
             <ServiceCard
               key={service.id}
               title={service.title}
               category={service.category}
               price={service.price}
-              seller={service.freelancer}
+              seller={service.seller}
             />
           ))}
         </div>
@@ -120,7 +176,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer />
+
     </main>
   );
 }

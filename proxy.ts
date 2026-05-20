@@ -5,8 +5,8 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get("skilllanka_token")?.value;
   const { pathname } = request.nextUrl;
 
-  // 1. If user is NOT logged in, restrict access to dashboard
-  if (pathname.startsWith("/dashboard")) {
+  // 1. If user is NOT logged in, restrict access to dashboard & post-job
+  if (pathname.startsWith("/dashboard") || pathname === "/post-job") {
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -24,5 +24,5 @@ export function proxy(request: NextRequest) {
 
 // Specify the paths where this proxy should run
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: ["/dashboard/:path*", "/login", "/register", "/post-job"],
 };
