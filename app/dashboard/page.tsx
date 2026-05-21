@@ -6,6 +6,11 @@ import StatsGrid from "./_components/StatsGrid";
 import FreelancerView from "./_components/freelancerView/FreelancerView";
 import ClientView from "./_components/clientView/ClientView";
 import QuickActions from "./_components/QuickActions";
+import AddServiceModal from "./_components/AddServiceModal";
+import EditProfileModal from "./_components/EditProfileModal";
+import MessagesModal from "./_components/MessagesModal";
+import AnalyticsModal from "./_components/AnalyticsModal";
+import ManageRequestModal from "./_components/ManageRequestModal";
 
 type LoggedInUser = {
   id: string;
@@ -14,6 +19,7 @@ type LoggedInUser = {
   role: string;
   phone?: string | null;
   location?: string | null;
+  image?: string | null;
 };
 
 const activities = [
@@ -30,6 +36,23 @@ export default function DashboardPage() {
 
   // --- ADD STATES FOR REALTIME DATA ---
   const [dbData, setDbData] = useState<any>(null);
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+  const [manageRequestId, setManageRequestId] = useState<string | null>(null);
+
+  const fetchDashboardData = async () => {
+    try {
+      const res = await fetch("/api/dashboard");
+      const data = await res.json();
+      if (data.success) {
+        setDbData(data);
+      }
+    } catch (err) {
+      console.error("Error loading dashboard data:", err);
+    }
+  };
 
   useEffect(() => {
     const savedUser = localStorage.getItem("skillLankaUser");
@@ -43,13 +66,7 @@ export default function DashboardPage() {
       setUser(parsedUser);
 
       // Fetch DB stats & lists
-      fetch("/api/dashboard")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            setDbData(data);
-          }
-        });
+      fetchDashboardData();
     } catch {
       localStorage.removeItem("skillLankaUser");
       router.push("/login");
@@ -80,10 +97,25 @@ export default function DashboardPage() {
     return null;
   }
 
+  // Dynamic Profile Completion Calculation
+  const hasBasicAccount = !!user.name;
+  const hasEmail = !!user.email;
+  const hasRole = !!user.role;
+  const hasImage = !!user.image;
+  const hasContact = !!(user.phone && user.location);
+
+  let progressPercent = 0;
+  if (hasBasicAccount) progressPercent += 20;
+  if (hasEmail) progressPercent += 20;
+  if (hasRole) progressPercent += 20;
+  if (hasImage) progressPercent += 20;
+  if (hasContact) progressPercent += 20;
+
   return (
-    <main className="min-h-screen bg-gray-50 animate-fade-in">
-      {/* Header Section */}
-      <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
+    <main className="min-h-screen bg-gray-50">
+      <div className="animate-fade-in">
+        {/* Header Section */}
+        <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 inline-block rounded-full bg-white/10 px-5 py-2 text-sm font-semibold">
             {user.role === "FREELANCER"
@@ -140,9 +172,15 @@ export default function DashboardPage() {
           <FreelancerView
             hireRequests={dbData?.hireRequests}
             services={dbData?.services}
+            onAddServiceClick={() => setIsServiceModalOpen(true)}
+            onManageRequest={(id) => setManageRequestId(id)}
           />
         ) : (
-          <ClientView postedJobs={dbData?.postedJobs} />
+          <ClientView
+            postedJobs={dbData?.postedJobs}
+            sentHireRequests={dbData?.sentHireRequests}
+            onManageRequest={(id) => setManageRequestId(id)}
+          />
         )}
 
         {/* Right Column Content (Sidebar) */}
@@ -194,29 +232,41 @@ export default function DashboardPage() {
             <div className="mt-5">
               <div className="mb-2 flex justify-between text-sm font-bold">
                 <span className="text-gray-600">Progress</span>
-                <span className="text-blue-600">80%</span>
+                <span className="text-blue-600">{progressPercent}%</span>
               </div>
 
               <div className="h-4 overflow-hidden rounded-full bg-gray-100">
-                <div className="h-full w-4/5 rounded-full bg-blue-600"></div>
+                <div
+                  className="h-full rounded-full bg-blue-600 transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                ></div>
               </div>
             </div>
 
             <div className="mt-6 space-y-3 text-sm text-gray-700">
-              <p>✅ Basic account created</p>
-              <p>✅ Email added</p>
-              <p>✅ Role selected</p>
-              <p>⚠️ Add profile image</p>
-              <p>⚠️ Add portfolio details</p>
+              <p>{hasBasicAccount ? "✅" : "⚠️"} Basic account created</p>
+              <p>{hasEmail ? "✅" : "⚠️"} Email added</p>
+              <p>{hasRole ? "✅" : "⚠️"} Role selected</p>
+              <p>{hasImage ? "✅" : "⚠️"} Add profile image</p>
+              <p>{hasContact ? "✅" : "⚠️"} Add contact details (Phone & Location)</p>
             </div>
 
-            <button className="mt-6 w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white hover:bg-blue-700 cursor-pointer">
+            <button
+              onClick={() => setIsEditProfileOpen(true)}
+              className="mt-6 w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white hover:bg-blue-700 cursor-pointer"
+            >
               Improve Profile
             </button>
           </div>
 
           {/* Quick Actions (Role-Specific) */}
-          <QuickActions role={user.role} />
+          <QuickActions
+            role={user.role}
+            onAddServiceClick={() => setIsServiceModalOpen(true)}
+            onEditProfileClick={() => setIsEditProfileOpen(true)}
+            onViewMessagesClick={() => setIsMessagesOpen(true)}
+            onViewAnalyticsClick={() => setIsAnalyticsOpen(true)}
+          />
 
           {/* Recent Activity */}
           <div className="rounded-3xl bg-white p-8 shadow-sm">
@@ -235,6 +285,43 @@ export default function DashboardPage() {
           </div>
         </aside>
       </section>
+    </div>
+
+    <AddServiceModal
+        isOpen={isServiceModalOpen}
+        onClose={() => setIsServiceModalOpen(false)}
+        onSuccess={fetchDashboardData}
+      />
+
+      <EditProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        user={user}
+        onSuccess={(updatedUser) => {
+          setUser(updatedUser);
+          fetchDashboardData();
+        }}
+      />
+
+      <MessagesModal
+        isOpen={isMessagesOpen}
+        onClose={() => setIsMessagesOpen(false)}
+        role={user.role}
+      />
+
+      <AnalyticsModal
+        isOpen={isAnalyticsOpen}
+        onClose={() => setIsAnalyticsOpen(false)}
+        stats={dbData?.stats}
+      />
+
+      <ManageRequestModal
+        isOpen={!!manageRequestId}
+        onClose={() => setManageRequestId(null)}
+        requestId={manageRequestId}
+        role={user.role}
+        onUpdate={fetchDashboardData}
+      />
     </main>
   );
 }

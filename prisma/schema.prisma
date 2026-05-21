@@ -105,6 +105,8 @@ model HireRequest {
 
   service    Service?    @relation(fields: [serviceId], references: [id], onDelete: SetNull)
   jobRequest JobRequest? @relation(fields: [jobRequestId], references: [id], onDelete: SetNull)
+
+  chatMessages ChatMessage[]
 }
 
 model Review {
@@ -120,4 +122,14 @@ model Review {
   freelancer User @relation("FreelancerReviews", fields: [freelancerId], references: [id], onDelete: Cascade)
 
   service Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+}
+
+model ChatMessage {
+  id            String   @id @default(cuid())
+  hireRequestId String
+  senderId      String
+  message       String
+  createdAt     DateTime @default(now())
+
+  hireRequest   HireRequest @relation(fields: [hireRequestId], references: [id], onDelete: Cascade)
 }

@@ -208,9 +208,17 @@ export default function FreelancersPage() {
                 className="flex h-full flex-col rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className="flex flex-1 flex-col gap-5 sm:flex-row">
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-emerald-500 text-2xl font-black text-white">
-                    {freelancer.name.charAt(0)}
-                  </div>
+                  {freelancer.image ? (
+                    <img
+                      src={freelancer.image}
+                      alt={freelancer.name}
+                      className="h-20 w-20 shrink-0 rounded-3xl object-cover border border-gray-100 shadow-sm"
+                    />
+                  ) : (
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-emerald-500 text-2xl font-black text-white">
+                      {freelancer.name.charAt(0)}
+                    </div>
+                  )}
 
                   <div className="flex flex-1 flex-col">
                     <div className="flex flex-col justify-between gap-3 md:flex-row">

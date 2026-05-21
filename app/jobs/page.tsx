@@ -31,6 +31,19 @@ export default function JobsPage() {
   const [searchText, setSearchText] = useState("");
   const [category, setCategory] = useState("All Categories");
   const [location, setLocation] = useState("All Locations");
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("skillLankaUser");
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        setUserRole(user.role);
+      } catch (err) {
+        console.error("Error parsing user role:", err);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     async function loadJobRequests() {
@@ -77,9 +90,7 @@ export default function JobsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-     
-
-      <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-500 px-6 py-20 text-white">
+      <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-500 px-6 py-20 text-white animate-fade-in">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 inline-block rounded-full bg-white/15 px-5 py-2 text-sm font-semibold">
             Browse Sri Lankan Job Requests
@@ -98,7 +109,11 @@ export default function JobsPage() {
 
       <section className="mx-auto max-w-7xl px-6 py-10">
         <div className="rounded-3xl bg-white p-5 shadow-sm">
-          <div className="grid gap-4 md:grid-cols-5">
+          <div
+            className={`grid gap-4 ${
+              userRole === "FREELANCER" ? "md:grid-cols-4" : "md:grid-cols-5"
+            }`}
+          >
             <input
               type="text"
               placeholder="Search jobs..."
@@ -140,12 +155,14 @@ export default function JobsPage() {
               <option>Remote only</option>
             </select>
 
-            <Link
-              href="/post-job"
-              className="rounded-2xl bg-blue-600 px-6 py-3 text-center font-semibold text-white hover:bg-blue-700"
-            >
-              Post Job
-            </Link>
+            {userRole !== "FREELANCER" && (
+              <Link
+                href="/post-job"
+                className="rounded-2xl bg-blue-600 px-6 py-3 text-center font-semibold text-white hover:bg-blue-700"
+              >
+                Post Job
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -163,12 +180,14 @@ export default function JobsPage() {
             </p>
           </div>
 
-          <Link
-            href="/post-job"
-            className="rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white hover:bg-blue-600"
-          >
-            + Post New Job
-          </Link>
+          {userRole !== "FREELANCER" && (
+            <Link
+              href="/post-job"
+              className="rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white hover:bg-blue-600"
+            >
+              + Post New Job
+            </Link>
+          )}
         </div>
 
         {loading ? (
@@ -216,9 +235,7 @@ export default function JobsPage() {
                     <p className="font-semibold text-gray-600">
                       By {job.client?.name || "Client"}
                     </p>
-                    <p className="font-bold text-blue-600">
-                      {job.budget}
-                    </p>
+                    <p className="font-bold text-blue-600">{job.budget}</p>
                   </div>
 
                   <h3 className="text-xl font-black leading-7 text-gray-900">
@@ -258,9 +275,11 @@ export default function JobsPage() {
                     </div>
                   </div>
 
-                  <button className="mt-5 block w-full rounded-full bg-gray-900 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-blue-600">
-                    Send Offer
-                  </button>
+                  {userRole === "FREELANCER" && (
+                    <button className="mt-5 block w-full rounded-full bg-gray-900 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-blue-600">
+                      Send Offer
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

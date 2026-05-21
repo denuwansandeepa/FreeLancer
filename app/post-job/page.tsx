@@ -19,6 +19,7 @@ export default function PostJobPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("skillLankaUser");
@@ -31,11 +32,24 @@ export default function PostJobPage() {
       const user = JSON.parse(savedUser);
       if (user.role !== "CLIENT") {
         router.push("/dashboard");
+      } else {
+        setIsClient(true);
       }
     } catch {
       router.push("/login");
     }
   }, [router]);
+
+  if (!isClient) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-3xl shadow-sm text-center">
+          <h1 className="text-2xl font-black text-gray-900">Loading...</h1>
+          <p className="mt-2 text-gray-600">Verifying authorization.</p>
+        </div>
+      </main>
+    );
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -79,7 +93,9 @@ export default function PostJobPage() {
       }
 
       setIsError(false);
-      setMessage("✅ Job request posted successfully. You can now see it on the Services page.");
+      setMessage(
+        "✅ Job request posted successfully. You can now see it on the Services page.",
+      );
 
       setTitle("");
       setCategory("");
@@ -99,8 +115,7 @@ export default function PostJobPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-     
-      <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
+      <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white animate-fade-in">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 inline-block rounded-full bg-white/10 px-5 py-2 text-sm font-semibold">
             Post a Job Request
@@ -304,8 +319,9 @@ export default function PostJobPage() {
 
             <p className="mt-4 text-sm leading-7 text-gray-300">
               I need a modern website for my clothing shop. It should have home,
-              about, products, contact page, WhatsApp button, and mobile-friendly
-              design. Budget is around Rs. 30,000 and I need it within 10 days.
+              about, products, contact page, WhatsApp button, and
+              mobile-friendly design. Budget is around Rs. 30,000 and I need it
+              within 10 days.
             </p>
           </div>
         </aside>

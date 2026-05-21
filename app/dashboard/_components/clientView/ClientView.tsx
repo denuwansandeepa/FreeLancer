@@ -1,9 +1,19 @@
+"use client";
+
 import Link from "next/link";
 
 type JobItem = {
   title: string;
   budget: string;
   proposals: number;
+  status: string;
+};
+
+type SentHireRequestItem = {
+  id: string;
+  freelancer: string;
+  service: string;
+  budget: string;
   status: string;
 };
 
@@ -31,11 +41,14 @@ const defaultPostedJobs: JobItem[] = [
 
 interface ClientViewProps {
   postedJobs?: JobItem[];
+  sentHireRequests?: SentHireRequestItem[];
+  onManageRequest?: (id: string) => void;
 }
 
-export default function ClientView({ postedJobs }: ClientViewProps) {
+export default function ClientView({ postedJobs, sentHireRequests, onManageRequest }: ClientViewProps) {
   // Use database values if available, otherwise fall back to mock data
   const activeJobs = postedJobs || defaultPostedJobs;
+  const activeHires = sentHireRequests || [];
 
   return (
     <div className="space-y-8">
@@ -95,6 +108,81 @@ export default function ClientView({ postedJobs }: ClientViewProps) {
           </table>
         </div>
       </div>
+
+      {/* Sent Hire Requests Panel */}
+      <div className="rounded-3xl bg-white p-8 shadow-sm">
+        <div>
+          <h2 className="text-2xl font-black text-gray-900">
+            Direct Hire Requests Sent
+          </h2>
+          <p className="mt-1 text-gray-600">
+            Track direct hire requests you have sent to freelancers.
+          </p>
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200">
+          {activeHires.length === 0 ? (
+            <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+              <p className="text-gray-500 font-medium">You haven't sent any direct hire requests yet.</p>
+              <Link
+                href="/services"
+                className="mt-3 inline-block rounded-full bg-blue-600 px-6 py-2.5 text-xs font-bold text-white hover:bg-blue-700 transition cursor-pointer"
+              >
+                Browse Services to Hire
+              </Link>
+            </div>
+          ) : (
+            <table className="w-full text-left text-sm">
+              <thead className="bg-gray-50 text-gray-600">
+                <tr>
+                  <th className="px-5 py-4">Freelancer</th>
+                  <th className="px-5 py-4">Service</th>
+                  <th className="px-5 py-4">Budget</th>
+                  <th className="px-5 py-4">Status</th>
+                  <th className="px-5 py-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {activeHires.map((req, index) => (
+                  <tr key={index} className="bg-white">
+                    <td className="px-5 py-4 font-bold text-gray-900">
+                      {req.freelancer}
+                    </td>
+                    <td className="px-5 py-4 text-gray-600">{req.service}</td>
+                    <td className="px-5 py-4 font-bold text-gray-900">
+                      {req.budget}
+                    </td>
+                    <td className="px-5 py-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          req.status === "COMPLETED"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : req.status === "ACCEPTED"
+                            ? "bg-blue-50 text-blue-700"
+                            : req.status === "REJECTED"
+                            ? "bg-red-50 text-red-700"
+                            : "bg-yellow-50 text-yellow-700 font-bold"
+                        }`}
+                      >
+                        {req.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <button
+                        onClick={() => onManageRequest && onManageRequest(req.id)}
+                        className="text-blue-600 font-bold hover:underline"
+                      >
+                        Manage
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+

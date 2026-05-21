@@ -9,6 +9,7 @@ export async function GET() {
           select: {
             name: true,
             email: true,
+            image: true,
             receivedReviews: {
               select: {
                 rating: true,
@@ -42,8 +43,9 @@ export async function GET() {
       return {
         id: profile.id,
         name: profile.user.name,
+        image: profile.user.image || profile.profileImage,
         title: profile.title,
-        location: profile.location,
+        location: profile.location || profile.user.location || "Sri Lanka",
         category: profile.category,
         skills: profile.skills ? profile.skills.split(",").map((s) => s.trim()) : [],
         price: profile.startingPrice || "Negotiable",

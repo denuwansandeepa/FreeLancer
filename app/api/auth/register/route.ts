@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { name, email, password, role, phone, location } = body;
+    const { name, email, password, confirmPassword, role, phone, location, title, skills, category, startingPrice } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -23,6 +23,16 @@ export async function POST(request: Request) {
         {
           success: false,
           message: "Password must be at least 6 characters.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (password !== confirmPassword) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Passwords do not match.",
         },
         { status: 400 }
       );
@@ -59,12 +69,12 @@ export async function POST(request: Request) {
         ...(isFreelancer && {
           freelancerProfile: {
             create: {
-              title: "New Freelancer",
+              title: title || "New Freelancer",
               bio: `Hi, I am ${name}. I am ready to work.`,
-              category: "Other",
+              category: category || "Other",
               location: location || "Sri Lanka",
-              skills: "Not specified",
-              startingPrice: "Negotiable",
+              skills: skills || "Not specified",
+              startingPrice: startingPrice || "Negotiable",
               experience: "New",
             },
           },

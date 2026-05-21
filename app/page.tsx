@@ -12,6 +12,7 @@ export default async function Home() {
       user: {
         select: {
           name: true,
+          image: true,
           receivedReviews: {
             select: {
               rating: true,
@@ -35,10 +36,11 @@ export default async function Home() {
       id: profile.id,
       name: profile.user.name,
       title: profile.title,
-      location: profile.location,
+      location: profile.location || profile.user.location || "Sri Lanka",
       skills: profile.skills ? profile.skills.split(",").map((s) => s.trim()) : [],
       price: profile.startingPrice || "Negotiable",
       rating: avgRating,
+      image: profile.user.image || profile.profileImage || undefined,
     };
   });
 

@@ -83,6 +83,7 @@ export async function GET() {
           },
         ],
         hireRequests: hireRequests.map((r) => ({
+          id: r.id,
           client: r.client.name,
           service: r.service?.title || "Custom Hire Request",
           budget: r.budget || "Negotiable",
@@ -105,6 +106,24 @@ export async function GET() {
         orderBy: { createdAt: "desc" },
       });
 
+      // 2. Fetch Hire Requests sent by this client
+      const sentHireRequests = await prisma.hireRequest.findMany({
+        where: { clientId: userId },
+        include: {
+          freelancer: {
+            select: { name: true },
+          },
+          service: {
+            select: { title: true },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      const activeHiresCount = sentHireRequests.filter(
+        (r) => r.status === "ACCEPTED" || r.status === "PENDING"
+      ).length;
+
       return NextResponse.json({
         success: true,
         stats: [
@@ -115,9 +134,9 @@ export async function GET() {
             icon: "📋",
           },
           {
-            title: "Proposals Received",
-            value: "0",
-            change: "Proposals",
+            title: "Direct Hires Sent",
+            value: sentHireRequests.length.toString(),
+            change: "Sent requests",
             icon: "✉️",
           },
           {
@@ -126,13 +145,25 @@ export async function GET() {
             change: "This month",
             icon: "💳",
           },
-          { title: "Active Hires", value: "0", change: "Ongoing", icon: "🤝" },
+          {
+            title: "Active Hires",
+            value: activeHiresCount.toString(),
+            change: "Ongoing",
+            icon: "🤝",
+          },
         ],
         postedJobs: jobRequests.map((j) => ({
           title: j.title,
           budget: j.budget,
           proposals: j.hireRequests.length,
           status: j.status,
+        })),
+        sentHireRequests: sentHireRequests.map((r) => ({
+          id: r.id,
+          freelancer: r.freelancer.name,
+          service: r.service?.title || "Direct Hire Request",
+          budget: r.budget || "Negotiable",
+          status: r.status,
         })),
       });
     }

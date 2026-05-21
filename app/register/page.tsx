@@ -12,6 +12,13 @@ export default function RegisterPage() {
   const [role, setRole] = useState("CLIENT");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  
+  // Freelancer specific fields
+  const [title, setTitle] = useState("");
+  const [skills, setSkills] = useState("");
+  const [category, setCategory] = useState("Web Development");
+  const [location, setLocation] = useState("Colombo");
+  const [startingPrice, setStartingPrice] = useState("Negotiable");
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -26,6 +33,12 @@ export default function RegisterPage() {
     if (!name || !email || !password || !confirmPassword) {
       setIsError(true);
       setMessage("Please fill all required fields.");
+      return;
+    }
+
+    if (role === "FREELANCER" && (!title.trim() || !skills.trim())) {
+      setIsError(true);
+      setMessage("Please provide your professional title and skills.");
       return;
     }
 
@@ -53,7 +66,15 @@ export default function RegisterPage() {
           name,
           email,
           password,
+          confirmPassword,
           role,
+          ...(role === "FREELANCER" && {
+            title,
+            skills,
+            category,
+            location,
+            startingPrice,
+          }),
         }),
       });
 
@@ -148,6 +169,88 @@ export default function RegisterPage() {
                   </option>
                 </select>
               </div>
+
+              {role === "FREELANCER" && (
+                <div className="space-y-5 p-5 rounded-2xl bg-gray-50 border border-gray-100 animate-fade-in">
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-gray-700">
+                      Professional Title *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Full Stack Developer, Graphic Designer"
+                      value={title}
+                      onChange={(event) => setTitle(event.target.value)}
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-gray-700">
+                      Category *
+                    </label>
+                    <select
+                      value={category}
+                      onChange={(event) => setCategory(event.target.value)}
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    >
+                      <option value="Web Development">Web Development</option>
+                      <option value="Graphic Design">Graphic Design</option>
+                      <option value="Digital Marketing">Digital Marketing</option>
+                      <option value="Video Editing">Video Editing</option>
+                      <option value="Writing">Writing</option>
+                      <option value="App Development">App Development</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-gray-700">
+                      Location *
+                    </label>
+                    <select
+                      value={location}
+                      onChange={(event) => setLocation(event.target.value)}
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    >
+                      <option value="Colombo">Colombo</option>
+                      <option value="Kandy">Kandy</option>
+                      <option value="Galle">Galle</option>
+                      <option value="Gampaha">Gampaha</option>
+                      <option value="Kurunegala">Kurunegala</option>
+                      <option value="Jaffna">Jaffna</option>
+                      <option value="Sri Lanka">Sri Lanka</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-gray-700">
+                      Starting Price *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g., Rs. 5,000, Negotiable"
+                      value={startingPrice}
+                      onChange={(event) => setStartingPrice(event.target.value)}
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-gray-700">
+                      Skills (comma-separated) *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., React, Node.js, Photoshop, Copywriting"
+                      value={skills}
+                      onChange={(event) => setSkills(event.target.value)}
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-5 py-4 text-black placeholder:text-gray-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="mb-2 block text-sm font-bold text-gray-700">

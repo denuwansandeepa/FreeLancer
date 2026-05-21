@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "../../../lib/prisma";
+import FreelancerSidebar from "./FreelancerSidebar";
 
 type PageProps = {
   params: Promise<{
@@ -50,8 +51,9 @@ export default async function FreelancerProfilePage({ params }: PageProps) {
   const freelancer = {
     id: profile.id,
     name: profile.user.name,
+    image: profile.user.image || profile.profileImage,
     title: profile.title,
-    location: profile.location,
+    location: profile.location || profile.user.location || "Sri Lanka",
     category: profile.category,
     skills: profile.skills ? profile.skills.split(",").map((s) => s.trim()) : [],
     price: profile.startingPrice || "Negotiable",
@@ -65,7 +67,7 @@ export default async function FreelancerProfilePage({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 animate-fade-in">
 
       <section className="bg-gradient-to-br from-gray-950 via-blue-950 to-blue-700 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
@@ -79,9 +81,17 @@ export default async function FreelancerProfilePage({ params }: PageProps) {
           <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-center">
             <div>
               <div className="mb-6 flex items-center gap-5">
-                <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500 to-emerald-400 text-4xl font-black text-white shadow-xl">
-                  {freelancer.name.charAt(0)}
-                </div>
+                {freelancer.image ? (
+                  <img
+                    src={freelancer.image}
+                    alt={freelancer.name}
+                    className="h-24 w-24 rounded-3xl object-cover border border-white/20 shadow-xl"
+                  />
+                ) : (
+                  <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500 to-emerald-400 text-4xl font-black text-white shadow-xl">
+                    {freelancer.name.charAt(0)}
+                  </div>
+                )}
 
                 <div>
                   <h1 className="text-4xl font-black md:text-5xl">
@@ -112,44 +122,7 @@ export default async function FreelancerProfilePage({ params }: PageProps) {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-white p-6 text-gray-900 shadow-2xl">
-              <p className="text-sm text-gray-500">Starting from</p>
-              <p className="mt-1 text-4xl font-black">{freelancer.price}</p>
-
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="rounded-2xl bg-gray-50 p-4">
-                  <p className="text-sm text-gray-500">Rating</p>
-                  <p className="mt-1 font-black text-yellow-500">
-                    ⭐ {freelancer.rating}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-gray-50 p-4">
-                  <p className="text-sm text-gray-500">Jobs Done</p>
-                  <p className="mt-1 font-black">
-                    {freelancer.completedJobs}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-gray-50 p-4">
-                  <p className="text-sm text-gray-500">Experience</p>
-                  <p className="mt-1 font-black">{freelancer.experience}</p>
-                </div>
-
-                <div className="rounded-2xl bg-gray-50 p-4">
-                  <p className="text-sm text-gray-500">Response</p>
-                  <p className="mt-1 font-black">{freelancer.responseTime}</p>
-                </div>
-              </div>
-
-              <button className="mt-6 w-full rounded-full bg-blue-600 px-6 py-4 font-bold text-white transition hover:bg-blue-700">
-                Hire This Freelancer
-              </button>
-
-              <button className="mt-3 w-full rounded-full border border-gray-300 px-6 py-4 font-bold text-gray-800 transition hover:bg-gray-100">
-                Send Message
-              </button>
-            </div>
+            <FreelancerSidebar freelancer={freelancer} />
           </div>
         </div>
       </section>
