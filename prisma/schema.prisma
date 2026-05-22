@@ -27,6 +27,7 @@ model User {
 
   writtenReviews  Review[] @relation("ClientReviews")
   receivedReviews Review[] @relation("FreelancerReviews")
+  notifications   Notification[]
 }
 
 model FreelancerProfile {
@@ -126,10 +127,22 @@ model Review {
 
 model ChatMessage {
   id            String   @id @default(cuid())
+  isRead        Boolean  @default(false)
   hireRequestId String
   senderId      String
   message       String
   createdAt     DateTime @default(now())
 
   hireRequest   HireRequest @relation(fields: [hireRequestId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  text      String
+  link      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

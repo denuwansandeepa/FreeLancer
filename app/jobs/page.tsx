@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import Footer from "../components/Footer";
+import ApplyJobModal from "../components/ApplyJobModal";
 
 type JobRequest = {
   id: string;
@@ -32,6 +33,9 @@ export default function JobsPage() {
   const [category, setCategory] = useState("All Categories");
   const [location, setLocation] = useState("All Locations");
   const [userRole, setUserRole] = useState<string | null>(null);
+
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("skillLankaUser");
@@ -276,8 +280,19 @@ export default function JobsPage() {
                   </div>
 
                   {userRole === "FREELANCER" && (
-                    <button className="mt-5 block w-full rounded-full bg-gray-900 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-blue-600">
-                      Send Offer
+                    <button 
+                      onClick={() => {
+                        setSelectedJob({
+                          id: job.id,
+                          title: job.title,
+                          budget: job.budget,
+                          clientName: job.client?.name || "Client"
+                        });
+                        setIsApplyModalOpen(true);
+                      }}
+                      className="mt-5 block w-full rounded-full bg-gray-900 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-blue-600"
+                    >
+                      Get Job
                     </button>
                   )}
                 </div>
@@ -286,6 +301,15 @@ export default function JobsPage() {
           </div>
         )}
       </section>
+
+      <ApplyJobModal
+        isOpen={isApplyModalOpen}
+        onClose={() => {
+          setIsApplyModalOpen(false);
+          setSelectedJob(null);
+        }}
+        job={selectedJob}
+      />
 
       <Footer />
     </main>

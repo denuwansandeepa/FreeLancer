@@ -116,6 +116,9 @@ export async function GET() {
           service: {
             select: { title: true },
           },
+          jobRequest: {
+            select: { title: true },
+          },
         },
         orderBy: { createdAt: "desc" },
       });
@@ -158,10 +161,10 @@ export async function GET() {
           proposals: j.hireRequests.length,
           status: j.status,
         })),
-        sentHireRequests: sentHireRequests.map((r) => ({
+        sentHireRequests: sentHireRequests.map((r: any) => ({
           id: r.id,
           freelancer: r.freelancer.name,
-          service: r.service?.title || "Direct Hire Request",
+          service: r.jobRequest ? `Application: ${r.jobRequest.title}` : (r.service?.title || "Direct Hire Request"),
           budget: r.budget || "Negotiable",
           status: r.status,
         })),

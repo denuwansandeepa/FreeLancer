@@ -33,7 +33,7 @@ export default function Navbar() {
   const [modalTarget, setModalTarget] = useState("");
   const [showRoleModal, setShowRoleModal] = useState(false);
 
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -92,62 +92,67 @@ export default function Navbar() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!user) {
-      setNotifications([]);
-      return;
-    }
+  const baseNotifications: NotificationItem[] = user
+    ? user.role === "FREELANCER"
+      ? [
+          {
+            id: "f1",
+            text: "New hire request received from Saman Enterprises.",
+            time: "5 mins ago",
+            read: false,
+            link: "/dashboard",
+          },
+          {
+            id: "f2",
+            text: "Client accepted your custom service offer.",
+            time: "1 hour ago",
+            read: false,
+            link: "/dashboard",
+          },
+          {
+            id: "f3",
+            text: "You successfully updated your freelancer profile.",
+            time: "2 hours ago",
+            read: true,
+            link: "/dashboard",
+          },
+        ]
+      : [
+          {
+            id: "c1",
+            text: "Sandeepa updated their freelancer location to Colombo.",
+            time: "10 mins ago",
+            read: false,
+            link: "/freelancers",
+          },
+          {
+            id: "c2",
+            text: "Your job request has received 3 applications.",
+            time: "3 hours ago",
+            read: false,
+            link: "/jobs",
+          },
+          {
+            id: "c3",
+            text: "A freelancer accepted your invitation to interview.",
+            time: "5 hours ago",
+            read: true,
+            link: "/dashboard",
+          },
+        ]
+    : [];
 
-    if (user.role === "FREELANCER") {
-      setNotifications([
-        {
-          id: "f1",
-          text: "New hire request received from Saman Enterprises.",
-          time: "5 mins ago",
-          read: false,
-          link: "/dashboard",
-        },
-        {
-          id: "f2",
-          text: "Client accepted your custom service offer.",
-          time: "1 hour ago",
-          read: false,
-          link: "/dashboard",
-        },
-        {
-          id: "f3",
-          text: "You successfully updated your freelancer profile.",
-          time: "2 hours ago",
-          read: true,
-          link: "/dashboard",
-        },
-      ]);
-    } else {
-      setNotifications([
-        {
-          id: "c1",
-          text: "Sandeepa updated their freelancer location to Colombo.",
-          time: "10 mins ago",
-          read: false,
-          link: "/freelancers",
-        },
-        {
-          id: "c2",
-          text: "Your job request has received 3 applications.",
-          time: "3 hours ago",
-          read: false,
-          link: "/jobs",
-        },
-        {
-          id: "c3",
-          text: "A freelancer accepted your invitation to interview.",
-          time: "5 hours ago",
-          read: true,
-          link: "/dashboard",
-        },
-      ]);
-    }
-  }, [user]);
+  const notifications = baseNotifications.map((item) => ({
+    ...item,
+    read: item.read || readNotificationIds.includes(item.id),
+  }));
+
+  useEffect(() => {
+    if (!showNotifications) return;
+    const handleClose = () => setShowNotifications(false);
+    window.addEventListener("click", handleClose);
+    return () => window.removeEventListener("click", handleClose);
+  }, [showNotifications]);
 
   async function handleLogout() {
     try {
@@ -161,6 +166,7 @@ export default function Navbar() {
 
     localStorage.removeItem("skillLankaUser");
     setUser(null);
+    setReadNotificationIds([]);
     setMobileOpen(false);
     router.push("/login");
     router.refresh();
@@ -183,23 +189,16 @@ export default function Navbar() {
   }
 
   function handleNotificationClick(notification: NotificationItem) {
-    setNotifications((prev) =>
-      prev.map((item) =>
-        item.id === notification.id ? { ...item, read: true } : item,
-      ),
-    );
+    if (!readNotificationIds.includes(notification.id)) {
+      setReadNotificationIds((prev) => [...prev, notification.id]);
+    }
 
     setShowNotifications(false);
     router.push(notification.link);
   }
 
   function markAllAsRead() {
-    setNotifications((prev) =>
-      prev.map((item) => ({
-        ...item,
-        read: true,
-      })),
-    );
+    setReadNotificationIds(baseNotifications.map((item) => item.id));
   }
 
   function isActiveLink(href: string) {
@@ -240,9 +239,11 @@ export default function Navbar() {
               Find Freelancers
             </Link>
 
-            <Link href="/jobs" className={navLinkClass("/jobs")}>
-              Jobs
-            </Link>
+            {user?.role !== "CLIENT" && (
+              <Link href="/jobs" className={navLinkClass("/jobs")}>
+                Jobs
+              </Link>
+            )}
 
             {user?.role !== "FREELANCER" && (
               <Link
@@ -431,13 +432,15 @@ export default function Navbar() {
                 Find Freelancers
               </Link>
 
-              <Link
-                href="/jobs"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
-              >
-                Jobs
-              </Link>
+              {user?.role !== "CLIENT" && (
+                <Link
+                  href="/jobs"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
+                >
+                  Jobs
+                </Link>
+              )}
 
               {user?.role !== "FREELANCER" && (
                 <Link

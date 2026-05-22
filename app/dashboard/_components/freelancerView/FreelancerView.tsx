@@ -96,23 +96,32 @@ export default function FreelancerView({
                     <td className="px-5 py-4 font-bold text-gray-900">
                       {request.client}
                     </td>
-                    <td className="px-5 py-4 text-gray-600">{request.service}</td>
+                    <td className="px-5 py-4 text-gray-600">
+                      {request.service}
+                    </td>
                     <td className="px-5 py-4 font-bold text-gray-900">
                       {request.budget}
                     </td>
                     <td className="px-5 py-4">
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        request.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                        request.status === 'ACCEPTED' ? 'bg-blue-50 text-blue-700' :
-                        request.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          request.status === "PENDING"
+                            ? "bg-yellow-50 text-yellow-700"
+                            : request.status === "ACCEPTED"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : request.status === "COMPLETED"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
                         {request.status}
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
                       <button
-                        onClick={() => onManageRequest && onManageRequest(request.id)}
+                        onClick={() =>
+                          onManageRequest && onManageRequest(request.id)
+                        }
                         className="text-blue-600 font-bold hover:underline"
                       >
                         Manage
@@ -146,7 +155,9 @@ export default function FreelancerView({
         <div className="mt-6 grid gap-4">
           {activeServices.length === 0 ? (
             <div className="text-center py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-              <p className="text-gray-500">You haven't listed any services yet.</p>
+              <p className="text-gray-500">
+                You haven't listed any services yet.
+              </p>
               <button
                 onClick={onAddServiceClick}
                 className="mt-3 text-blue-600 font-bold hover:underline"

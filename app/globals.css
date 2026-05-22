@@ -49,6 +49,232 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
 
+.perspective-1000 {
+  perspective: 1000px;
+}
 
+.transform-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-card {
+  transform: rotateX(12deg) rotateY(-16deg);
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.9s ease both;
+}
+
+.animate-float {
+  animation: float3d 5.5s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float3d 6s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+.animate-float-slow {
+  animation: float3d 7s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+.animate-spin-slow {
+  animation: spinSlow 22s linear infinite;
+}
+
+.animate-blob {
+  animation: blobMove 9s ease-in-out infinite;
+}
+
+.animate-blob-delay {
+  animation: blobMove 10s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+.animate-blob-slow {
+  animation: blobMove 12s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.animate-card-hover {
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
+}
+
+.animate-card-hover:hover {
+  transform: translateY(-10px) scale(1.015);
+  filter: saturate(1.1);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float3d {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(12deg) rotateY(-16deg);
+  }
+
+  50% {
+    transform: translateY(-22px) rotateX(16deg) rotateY(-10deg);
+  }
+}
+
+@keyframes spinSlow {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes blobMove {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -25px) scale(1.08);
+  }
+
+  66% {
+    transform: translate(-20px, 25px) scale(0.94);
+  }
+}
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-card {
+  transform: rotateX(12deg) rotateY(-16deg);
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.9s ease both;
+}
+
+.animate-float {
+  animation: float3d 5.5s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float3d 6s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+.animate-float-slow {
+  animation: float3d 7s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+.animate-spin-slow {
+  animation: spinSlow 22s linear infinite;
+}
+
+.animate-blob {
+  animation: blobMove 9s ease-in-out infinite;
+}
+
+.animate-blob-delay {
+  animation: blobMove 10s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+.animate-blob-slow {
+  animation: blobMove 12s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.animate-card-hover {
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
+}
+
+.animate-card-hover:hover {
+  transform: translateY(-10px) scale(1.015);
+  filter: saturate(1.1);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float3d {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(12deg) rotateY(-16deg);
+  }
+
+  50% {
+    transform: translateY(-22px) rotateX(16deg) rotateY(-10deg);
+  }
+}
+
+@keyframes spinSlow {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes blobMove {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -25px) scale(1.08);
+  }
+
+  66% {
+    transform: translate(-20px, 25px) scale(0.94);
+  }
+}
  
