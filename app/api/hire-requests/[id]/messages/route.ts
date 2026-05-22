@@ -24,6 +24,10 @@ export async function POST(
 
     const hireRequest = await prisma.hireRequest.findUnique({
       where: { id },
+      include: {
+        client: { select: { id: true, name: true } },
+        freelancer: { select: { id: true, name: true } },
+      },
     });
 
     if (!hireRequest) {
@@ -53,9 +57,22 @@ export async function POST(
 
     const chatMessage = await prisma.chatMessage.create({
       data: {
-        hireRequestId: id,
         senderId: userId,
+        hireRequestId: id,
         message: message.trim(),
+      },
+    });
+
+    // Create a database notification for the message recipient
+    const recipientId = userId === hireRequest.clientId ? hireRequest.freelancerId : hireRequest.clientId;
+    const senderName = userId === hireRequest.clientId ? hireRequest.client.name : hireRequest.freelancer.name;
+    const previewText = message.length > 40 ? `${message.substring(0, 40).trim()}...` : message.trim();
+
+    await prisma.notification.create({
+      data: {
+        userId: recipientId,
+        text: `New message from ${senderName}: "${previewText}"`,
+        link: `/dashboard?requestId=${id}`,
       },
     });
 

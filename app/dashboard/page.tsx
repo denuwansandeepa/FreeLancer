@@ -67,6 +67,15 @@ export default function DashboardPage() {
 
       // Fetch DB stats & lists
       fetchDashboardData();
+
+      // Check if there is a requestId in the query params to auto-open it
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const reqId = params.get("requestId");
+        if (reqId) {
+          setManageRequestId(reqId);
+        }
+      }
     } catch {
       localStorage.removeItem("skillLankaUser");
       router.push("/login");
@@ -74,6 +83,15 @@ export default function DashboardPage() {
       setLoading(false);
     }
   }, [router]);
+
+  const handleCloseManageModal = () => {
+    setManageRequestId(null);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("requestId");
+      window.history.replaceState({}, "", url.pathname + url.search);
+    }
+  };
 
   function handleLogout() {
     localStorage.removeItem("skillLankaUser");
@@ -322,7 +340,7 @@ export default function DashboardPage() {
 
       <ManageRequestModal
         isOpen={!!manageRequestId}
-        onClose={() => setManageRequestId(null)}
+        onClose={handleCloseManageModal}
         requestId={manageRequestId}
         role={user.role}
         onUpdate={fetchDashboardData}

@@ -49,6 +49,9 @@ export async function GET() {
           service: {
             select: { title: true },
           },
+          jobRequest: {
+            select: { title: true },
+          },
         },
         orderBy: { createdAt: "desc" },
       });
@@ -85,7 +88,7 @@ export async function GET() {
         hireRequests: hireRequests.map((r) => ({
           id: r.id,
           client: r.client.name,
-          service: r.service?.title || "Custom Hire Request",
+          service: r.jobRequest ? `Applied Job: ${r.jobRequest.title}` : (r.service?.title || "Custom Hire Request"),
           budget: r.budget || "Negotiable",
           status: r.status,
         })),

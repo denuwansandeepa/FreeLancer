@@ -33,7 +33,7 @@ export default function Navbar() {
   const [modalTarget, setModalTarget] = useState("");
   const [showRoleModal, setShowRoleModal] = useState(false);
 
-  const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -92,60 +92,62 @@ export default function Navbar() {
     };
   }, []);
 
-  const baseNotifications: NotificationItem[] = user
-    ? user.role === "FREELANCER"
-      ? [
-          {
-            id: "f1",
-            text: "New hire request received from Saman Enterprises.",
-            time: "5 mins ago",
-            read: false,
-            link: "/dashboard",
-          },
-          {
-            id: "f2",
-            text: "Client accepted your custom service offer.",
-            time: "1 hour ago",
-            read: false,
-            link: "/dashboard",
-          },
-          {
-            id: "f3",
-            text: "You successfully updated your freelancer profile.",
-            time: "2 hours ago",
-            read: true,
-            link: "/dashboard",
-          },
-        ]
-      : [
-          {
-            id: "c1",
-            text: "Sandeepa updated their freelancer location to Colombo.",
-            time: "10 mins ago",
-            read: false,
-            link: "/freelancers",
-          },
-          {
-            id: "c2",
-            text: "Your job request has received 3 applications.",
-            time: "3 hours ago",
-            read: false,
-            link: "/jobs",
-          },
-          {
-            id: "c3",
-            text: "A freelancer accepted your invitation to interview.",
-            time: "5 hours ago",
-            read: true,
-            link: "/dashboard",
-          },
-        ]
-    : [];
+  useEffect(() => {
+    if (!user) {
+      setNotifications([]);
+      return;
+    }
 
-  const notifications = baseNotifications.map((item) => ({
-    ...item,
-    read: item.read || readNotificationIds.includes(item.id),
-  }));
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    function formatTimeAgo(dateString: string) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+      if (seconds < 60) return "Just now";
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes} min${minutes > 1 ? "s" : ""} ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+      const days = Math.floor(hours / 24);
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    }
+
+    async function fetchNotifications() {
+      try {
+        const res = await fetch("/api/notifications", { signal });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && !signal.aborted) {
+          const formatted = data.notifications.map((n: any) => ({
+            id: n.id,
+            text: n.text,
+            link: n.link,
+            read: n.read,
+            time: formatTimeAgo(n.createdAt),
+          }));
+          setNotifications(formatted);
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        if (err instanceof TypeError && err.message === "Failed to fetch") {
+          console.warn("Failed to fetch notifications (server may be offline or restarting).");
+        } else {
+          console.error("Error fetching notifications:", err);
+        }
+      }
+    }
+
+    fetchNotifications();
+
+    const interval = setInterval(fetchNotifications, 5000);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
+  }, [user]);
 
   useEffect(() => {
     if (!showNotifications) return;
@@ -166,7 +168,7 @@ export default function Navbar() {
 
     localStorage.removeItem("skillLankaUser");
     setUser(null);
-    setReadNotificationIds([]);
+    setNotifications([]);
     setMobileOpen(false);
     router.push("/login");
     router.refresh();
@@ -188,17 +190,44 @@ export default function Navbar() {
     }
   }
 
-  function handleNotificationClick(notification: NotificationItem) {
-    if (!readNotificationIds.includes(notification.id)) {
-      setReadNotificationIds((prev) => [...prev, notification.id]);
+  async function handleNotificationClick(notification: NotificationItem) {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationId: notification.id }),
+      });
+    } catch (err) {
+      console.error(err);
     }
+
+    setNotifications((prev) =>
+      prev.map((item) =>
+        item.id === notification.id ? { ...item, read: true } : item
+      )
+    );
 
     setShowNotifications(false);
     router.push(notification.link);
   }
 
-  function markAllAsRead() {
-    setReadNotificationIds(baseNotifications.map((item) => item.id));
+  async function markAllAsRead() {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
+    setNotifications((prev) =>
+      prev.map((item) => ({
+        ...item,
+        read: true,
+      }))
+    );
   }
 
   function isActiveLink(href: string) {

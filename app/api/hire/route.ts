@@ -98,6 +98,15 @@ export async function POST(request: Request) {
       },
     });
 
+    // Create notification for the freelancer
+    await prisma.notification.create({
+      data: {
+        userId: freelancerId,
+        text: `New hire request received from ${user.name}.`,
+        link: `/dashboard?requestId=${hireRequest.id}`,
+      },
+    });
+
     return NextResponse.json({
       success: true,
       message: "Hire request sent successfully!",

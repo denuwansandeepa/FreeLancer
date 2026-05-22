@@ -59,7 +59,7 @@ export default function ManageRequestModal({
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
-  };
+  }
 
   const handleUpdateStatus = async (newStatus: string) => {
     try {
@@ -134,17 +134,42 @@ export default function ManageRequestModal({
             onClick={onClose}
             className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
           >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <svg className="animate-spin h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <svg
+              className="animate-spin h-8 w-8 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
           </div>
         ) : requestData ? (
@@ -153,8 +178,8 @@ export default function ManageRequestModal({
             <div className="bg-gray-50 px-8 py-4 flex flex-wrap gap-4 items-center justify-between border-b text-sm">
               <div className="flex gap-4">
                 <div className="font-bold text-gray-900">
-                  <span className="text-gray-500 font-normal">Service:</span>{" "}
-                  {requestData.service?.title || "Custom Job"}
+                  <span className="text-gray-500 font-normal">Service / Job:</span>{" "}
+                  {requestData.jobRequest ? `Job: ${requestData.jobRequest.title}` : (requestData.service?.title || "Custom Job")}
                 </div>
                 <div className="font-bold text-gray-900">
                   <span className="text-gray-500 font-normal">Budget:</span>{" "}
@@ -162,35 +187,65 @@ export default function ManageRequestModal({
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  requestData.status === "PENDING" ? "bg-yellow-100 text-yellow-700" :
-                  requestData.status === "ACCEPTED" ? "bg-blue-100 text-blue-700" :
-                  requestData.status === "COMPLETED" ? "bg-emerald-100 text-emerald-700" :
-                  "bg-red-100 text-red-700"
-                }`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    requestData.status === "PENDING"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : requestData.status === "ACCEPTED"
+                        ? "bg-blue-100 text-blue-700"
+                        : requestData.status === "COMPLETED"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-red-100 text-red-700"
+                  }`}
+                >
                   {requestData.status}
                 </span>
 
-                {role === "FREELANCER" && requestData.status === "PENDING" && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleUpdateStatus("ACCEPTED")}
-                      className="rounded-full bg-blue-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition"
-                    >
-                      Accept
-                    </button>
-                    <button
-                      onClick={() => handleUpdateStatus("REJECTED")}
-                      className="rounded-full bg-red-100 px-4 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200 transition"
-                    >
-                      Reject
-                    </button>
-                  </div>
+                {/* Accept / Reject Buttons */}
+                {requestData.status === "PENDING" && (
+                  <>
+                    {/* For Job Application, the client accepts/rejects */}
+                    {requestData.jobRequestId && role === "CLIENT" && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleUpdateStatus("ACCEPTED")}
+                          className="rounded-full bg-blue-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition cursor-pointer"
+                        >
+                          Accept Application
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus("REJECTED")}
+                          className="rounded-full bg-red-100 px-4 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200 transition cursor-pointer"
+                        >
+                          Reject Application
+                        </button>
+                      </div>
+                    )}
+                    {/* For Direct Hire, the freelancer accepts/rejects */}
+                    {!requestData.jobRequestId && role === "FREELANCER" && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleUpdateStatus("ACCEPTED")}
+                          className="rounded-full bg-blue-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition cursor-pointer"
+                        >
+                          Accept Hire
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus("REJECTED")}
+                          className="rounded-full bg-red-100 px-4 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200 transition cursor-pointer"
+                        >
+                          Reject Hire
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
-                {role === "FREELANCER" && requestData.status === "ACCEPTED" && (
+
+                {/* Mark Completed Button */}
+                {requestData.status === "ACCEPTED" && (
                   <button
                     onClick={() => handleUpdateStatus("COMPLETED")}
-                    className="rounded-full bg-emerald-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition"
+                    className="rounded-full bg-emerald-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition cursor-pointer"
                   >
                     Mark Completed
                   </button>
@@ -202,18 +257,33 @@ export default function ManageRequestModal({
             <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-white">
               {/* Initial Request Message */}
               <div className="flex flex-col gap-1 items-start">
-                <span className="text-xs font-bold text-gray-400 pl-4">{requestData.client.name}</span>
+                <span className="text-xs font-bold text-gray-400 pl-4">
+                  {requestData.client.name}
+                </span>
                 <div className="bg-gray-100 text-gray-800 rounded-2xl rounded-tl-none px-5 py-3 max-w-[80%] shadow-sm">
                   <p className="text-sm font-medium">{requestData.message}</p>
                 </div>
               </div>
 
               {requestData.chatMessages.map((msg: any) => {
-                const isMine = msg.senderId === (role === "FREELANCER" ? requestData.freelancer.id : requestData.client.id);
+                const isMine =
+                  msg.senderId ===
+                  (role === "FREELANCER"
+                    ? requestData.freelancer.id
+                    : requestData.client.id);
                 return (
-                  <div key={msg.id} className={`flex flex-col gap-1 ${isMine ? "items-end" : "items-start"}`}>
-                    <span className={`text-xs font-bold text-gray-400 ${isMine ? "pr-4" : "pl-4"}`}>
-                      {isMine ? "You" : (role === "FREELANCER" ? requestData.client.name : requestData.freelancer.name)}
+                  <div
+                    key={msg.id}
+                    className={`flex flex-col gap-1 ${isMine ? "items-end" : "items-start"}`}
+                  >
+                    <span
+                      className={`text-xs font-bold text-gray-400 ${isMine ? "pr-4" : "pl-4"}`}
+                    >
+                      {isMine
+                        ? "You"
+                        : role === "FREELANCER"
+                          ? requestData.client.name
+                          : requestData.freelancer.name}
                     </span>
                     <div
                       className={`px-5 py-3 rounded-2xl max-w-[80%] shadow-sm text-sm font-medium ${
@@ -243,7 +313,11 @@ export default function ManageRequestModal({
                 />
                 <button
                   type="submit"
-                  disabled={sending || !newMessage.trim() || requestData.status === "REJECTED"}
+                  disabled={
+                    sending ||
+                    !newMessage.trim() ||
+                    requestData.status === "REJECTED"
+                  }
                   className="rounded-full bg-blue-600 px-6 py-3 font-bold text-white transition hover:bg-blue-700 disabled:opacity-50"
                 >
                   Send
