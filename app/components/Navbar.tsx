@@ -284,9 +284,9 @@ export default function Navbar() {
             </Link>
 
             <Link
-              href="/dashboard"
+              href={user?.role === "ADMIN" ? "/admin" : "/dashboard"}
               onClick={(event) => handleNavClick(event, "Dashboard")}
-              className={navLinkClass("/dashboard")}
+              className={navLinkClass(user?.role === "ADMIN" ? "/admin" : "/dashboard")}
             >
               Dashboard
             </Link>
@@ -384,7 +384,7 @@ export default function Navbar() {
                 </div>
 
                 <Link
-                  href="/dashboard"
+                  href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
                   className="group flex items-center gap-3 rounded-full border border-blue-100 bg-blue-50 py-2 pl-2 pr-5 shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-100 hover:shadow-lg"
                 >
                   <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-600 to-emerald-400 text-sm font-black uppercase text-white shadow-md">
@@ -404,7 +404,7 @@ export default function Navbar() {
                       Hi, {user.name.split(" ")[0]}
                     </p>
                     <p className="text-[11px] font-bold text-slate-500">
-                      {user.role === "FREELANCER" ? "Freelancer" : "Client"}
+                      {user.role === "ADMIN" ? "Admin" : user.role === "FREELANCER" ? "Freelancer" : "Client"}
                     </p>
                   </div>
                 </Link>
@@ -485,7 +485,7 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/dashboard"
+                href={user?.role === "ADMIN" ? "/admin" : "/dashboard"}
                 onClick={(event) => handleNavClick(event, "Dashboard")}
                 className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
               >
@@ -497,7 +497,7 @@ export default function Navbar() {
               {user ? (
                 <div className="grid gap-3">
                   <Link
-                    href="/dashboard"
+                    href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-3 rounded-2xl bg-blue-50 p-3"
                   >

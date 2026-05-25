@@ -69,6 +69,10 @@ export default function DashboardPage() {
 
       try {
         const parsedUser = JSON.parse(savedUser);
+        if (parsedUser.role === "ADMIN") {
+          window.location.href = "/admin";
+          return;
+        }
         setUser(parsedUser);
 
         // Fetch DB stats & lists
