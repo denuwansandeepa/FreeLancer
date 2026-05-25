@@ -51,22 +51,15 @@ export default function Navbar() {
           return;
         }
 
-        const savedUser = localStorage.getItem("skillLankaUser");
-
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
-        }
+        localStorage.removeItem("skillLankaUser");
+        setUser(null);
       } catch {
-        const savedUser = localStorage.getItem("skillLankaUser");
-
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
-        }
+        localStorage.removeItem("skillLankaUser");
+        setUser(null);
       } finally {
         setCheckingUser(false);
       }
     }
-
     checkLoginUser();
   }, []);
 
@@ -133,7 +126,9 @@ export default function Navbar() {
       } catch (err: any) {
         if (err.name === "AbortError") return;
         if (err instanceof TypeError && err.message === "Failed to fetch") {
-          console.warn("Failed to fetch notifications (server may be offline or restarting).");
+          console.warn(
+            "Failed to fetch notifications (server may be offline or restarting).",
+          );
         } else {
           console.error("Error fetching notifications:", err);
         }
@@ -203,8 +198,8 @@ export default function Navbar() {
 
     setNotifications((prev) =>
       prev.map((item) =>
-        item.id === notification.id ? { ...item, read: true } : item
-      )
+        item.id === notification.id ? { ...item, read: true } : item,
+      ),
     );
 
     setShowNotifications(false);
@@ -226,7 +221,7 @@ export default function Navbar() {
       prev.map((item) => ({
         ...item,
         read: true,
-      }))
+      })),
     );
   }
 

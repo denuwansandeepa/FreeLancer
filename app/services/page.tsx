@@ -10,6 +10,7 @@ import HireModal from "../components/HireModal";
 
 export default function ServicesPage() {
   const router = useRouter();
+  const [errorServiceId, setErrorServiceId] = useState<string | null>(null);
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
@@ -181,9 +182,14 @@ export default function ServicesPage() {
                 price={service.price}
                 seller={service.seller}
                 userRole={userRole}
+                showError={errorServiceId === service.id}
                 onHire={(s) => {
                   if (!userRole) {
-                    router.push("/login?redirect=/services");
+                    setErrorServiceId(s.id);
+
+                    setTimeout(() => {
+                      router.push("/login");
+                    }, 5000);
                     return;
                   }
                   setSelectedService(s);

@@ -9,6 +9,7 @@ type ServiceCardProps = {
   price: string;
   seller: string;
   userRole?: string | null;
+  showError?: boolean;
   onHire?: (service: { id: string; title: string; price: string; seller: string }) => void;
 };
 
@@ -19,6 +20,7 @@ export default function ServiceCard({
   price,
   seller,
   userRole,
+  showError,
   onHire,
 }: ServiceCardProps) {
   return (
@@ -37,7 +39,13 @@ export default function ServiceCard({
             {title}
           </h3>
 
-          <p className="mt-2 text-sm text-gray-500">By {seller}</p>
+          <p className="mt-2 text-sm text-gray-500 font-semibold">By {seller}</p>
+
+          {showError && (
+            <p className="mt-2 text-xs font-black text-red-600 animate-pulse">
+              ⚠️ To hire a freelancer, you need a client Account.
+            </p>
+          )}
         </div>
       </div>
 

@@ -45,43 +45,52 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       const res = await fetch("/api/dashboard");
+      if (res.status === 401) {
+        localStorage.removeItem("skillLankaUser");
+        router.push("/login");
+        return;
+      }
       const data = await res.json();
       if (data.success) {
         setDbData(data);
       }
     } catch (err) {
-      console.error("Error loading dashboard data:", err);
+      console.log("Error loading dashboard data:", err);
     }
   };
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("skillLankaUser");
-    if (!savedUser) {
-      router.push("/login");
-      return;
-    }
-
-    try {
-      const parsedUser = JSON.parse(savedUser);
-      setUser(parsedUser);
-
-      // Fetch DB stats & lists
-      fetchDashboardData();
-
-      // Check if there is a requestId in the query params to auto-open it
-      if (typeof window !== "undefined") {
-        const params = new URLSearchParams(window.location.search);
-        const reqId = params.get("requestId");
-        if (reqId) {
-          setManageRequestId(reqId);
-        }
+    const initializeUser = () => {
+      const savedUser = localStorage.getItem("skillLankaUser");
+      if (!savedUser) {
+        router.push("/login");
+        return;
       }
-    } catch {
-      localStorage.removeItem("skillLankaUser");
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
+
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+
+        // Fetch DB stats & lists
+        fetchDashboardData();
+
+        // Check if there is a requestId in the query params to auto-open it
+        if (typeof window !== "undefined") {
+          const params = new URLSearchParams(window.location.search);
+          const reqId = params.get("requestId");
+          if (reqId) {
+            setManageRequestId(reqId);
+          }
+        }
+      } catch {
+        localStorage.removeItem("skillLankaUser");
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeUser();
   }, [router]);
 
   const handleCloseManageModal = () => {

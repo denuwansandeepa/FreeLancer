@@ -120,11 +120,19 @@ export default function ManageRequestModal({
         <div className="flex items-center justify-between border-b px-8 py-5">
           <div>
             <h3 className="text-xl font-black text-gray-900">
-              {loading ? "Loading..." : "Manage Hire Request"}
+              {loading
+                ? "Loading..."
+                : requestData?.jobRequestId
+                ? "Manage Job Application"
+                : "Manage Hire Request"}
             </h3>
             {!loading && requestData && (
               <p className="mt-1 text-sm font-semibold text-gray-500">
-                {role === "FREELANCER"
+                {requestData?.jobRequestId
+                  ? role === "FREELANCER"
+                    ? `Applied to: ${requestData.client.name}`
+                    : `Applicant: ${requestData.freelancer.name}`
+                  : role === "FREELANCER"
                   ? `From: ${requestData.client.name}`
                   : `To: ${requestData.freelancer.name}`}
               </p>
@@ -256,14 +264,40 @@ export default function ManageRequestModal({
             {/* Chat Area */}
             <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-white">
               {/* Initial Request Message */}
-              <div className="flex flex-col gap-1 items-start">
-                <span className="text-xs font-bold text-gray-400 pl-4">
-                  {requestData.client.name}
-                </span>
-                <div className="bg-gray-100 text-gray-800 rounded-2xl rounded-tl-none px-5 py-3 max-w-[80%] shadow-sm">
-                  <p className="text-sm font-medium">{requestData.message}</p>
-                </div>
-              </div>
+              {(() => {
+                const isJobApplication = !!requestData.jobRequestId;
+                const isInitialMine = isJobApplication
+                  ? role === "FREELANCER"
+                  : role === "CLIENT";
+                const initialSenderName = isJobApplication
+                  ? requestData.freelancer.name
+                  : requestData.client.name;
+
+                return (
+                  <div
+                    className={`flex flex-col gap-1 ${
+                      isInitialMine ? "items-end" : "items-start"
+                    }`}
+                  >
+                    <span
+                      className={`text-xs font-bold text-gray-400 ${
+                        isInitialMine ? "pr-4" : "pl-4"
+                      }`}
+                    >
+                      {isInitialMine ? "You" : initialSenderName}
+                    </span>
+                    <div
+                      className={`px-5 py-3 rounded-2xl max-w-[80%] shadow-sm text-sm font-medium ${
+                        isInitialMine
+                          ? "bg-blue-600 text-white rounded-tr-none"
+                          : "bg-gray-100 text-gray-800 rounded-tl-none"
+                      }`}
+                    >
+                      <p className="text-sm font-medium">{requestData.message}</p>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {requestData.chatMessages.map((msg: any) => {
                 const isMine =

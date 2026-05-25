@@ -56,6 +56,9 @@ export async function GET() {
         orderBy: { createdAt: "desc" },
       });
 
+      const directHiresCount = hireRequests.filter((r) => !r.jobRequestId).length;
+      const jobApplicationsCount = hireRequests.filter((r) => !!r.jobRequestId).length;
+
       return NextResponse.json({
         success: true,
         hasProfile: !!profile, // True if they have a profile created in the DB
@@ -68,9 +71,15 @@ export async function GET() {
           },
           {
             title: "Hire Requests",
-            value: hireRequests.length.toString(),
-            change: "New requests",
+            value: directHiresCount.toString(),
+            change: "Direct hires",
             icon: "📩",
+          },
+          {
+            title: "Job Applications",
+            value: jobApplicationsCount.toString(),
+            change: "Applied jobs",
+            icon: "📋",
           },
           {
             title: "Active Services",
@@ -78,19 +87,14 @@ export async function GET() {
             change: "Featured",
             icon: "💼",
           },
-          {
-            title: "Completed Jobs",
-            value: "0",
-            change: "None yet",
-            icon: "✅",
-          },
         ],
         hireRequests: hireRequests.map((r) => ({
           id: r.id,
           client: r.client.name,
-          service: r.jobRequest ? `Applied Job: ${r.jobRequest.title}` : (r.service?.title || "Custom Hire Request"),
+          service: r.jobRequest ? r.jobRequest.title : (r.service?.title || "Custom Hire Request"),
           budget: r.budget || "Negotiable",
           status: r.status,
+          jobRequestId: r.jobRequestId,
         })),
         services:
           profile?.services.map((s) => ({
