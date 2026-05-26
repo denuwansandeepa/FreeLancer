@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import Footer from "../components/Footer";
+
 
 export default function PostJobPage() {
   const router = useRouter();
@@ -327,7 +327,7 @@ export default function PostJobPage() {
         </aside>
       </section>
 
-      <Footer />
+     
     </main>
   );
 }

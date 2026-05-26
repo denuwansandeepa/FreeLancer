@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ServiceCard from "../components/ServiceCard";
-import Footer from "../components/Footer";
+
 import AddServiceModal from "../dashboard/_components/AddServiceModal";
 import HireModal from "../components/HireModal";
 
@@ -213,7 +213,7 @@ export default function ServicesPage() {
         service={selectedService}
       />
 
-      <Footer />
+     
     </main>
   );
 }
