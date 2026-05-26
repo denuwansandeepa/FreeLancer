@@ -269,7 +269,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {user?.role !== "FREELANCER" && (
+            {user?.role === "CLIENT" && (
               <Link
                 href="/post-job"
                 onClick={(event) => handleNavClick(event, "Post Job")}
@@ -466,7 +466,7 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {user?.role !== "FREELANCER" && (
+              {user?.role === "CLIENT" && (
                 <Link
                   href="/post-job"
                   onClick={(event) => handleNavClick(event, "Post Job")}

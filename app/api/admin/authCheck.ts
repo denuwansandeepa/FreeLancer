@@ -23,8 +23,16 @@ export async function authorizeAdmin() {
     where: { id: payload.id },
   });
 
-  // If the user does not exist or is not an ADMIN, block access
-  if (!user || user.role !== "ADMIN") {
+  // If the user does not exist, is not an ADMIN, or their email is not authorized in .env, block access
+  const allowedAdminEmails = (process.env.ADMIN_EMAILS || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase());
+
+  if (
+    !user ||
+    user.role !== "ADMIN" ||
+    !allowedAdminEmails.includes(user.email.toLowerCase())
+  ) {
     throw new Error("Forbidden: Admin privileges required.");
   }
 

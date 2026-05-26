@@ -22,6 +22,7 @@ export default function AdminDashboard() {
 
   // States for DB data
   const [stats, setStats] = useState<Stats | null>(null);
+  const [statsError, setStatsError] = useState<string | null>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
@@ -71,9 +72,18 @@ export default function AdminDashboard() {
 
   // 2. Fetchers
   const fetchStats = async () => {
-    const res = await fetch("/api/admin/stats");
-    const data = await res.json();
-    if (data.success) setStats(data.stats);
+    try {
+      setStatsError(null);
+      const res = await fetch("/api/admin/stats");
+      const data = await res.json();
+      if (data.success) {
+        setStats(data.stats);
+      } else {
+        setStatsError(data.message || "Failed to fetch stats");
+      }
+    } catch (err: any) {
+      setStatsError(err.message || "Failed to fetch stats");
+    }
   };
 
   const fetchUsers = async () => {
@@ -254,13 +264,6 @@ export default function AdminDashboard() {
                 Manage the SkillLanka platform: moderate registrants, approve or remove service gigs, review active job requests, and monitor overall platform growth.
               </p>
             </div>
-
-            <button 
-              onClick={() => router.push("/dashboard")}
-              className="rounded-full bg-white px-6 py-3.5 text-center font-bold text-gray-900 hover:bg-blue-50 transition duration-200 cursor-pointer shadow-md"
-            >
-              Exit to Dashboard &rarr;
-            </button>
           </div>
         </div>
       </section>
@@ -320,7 +323,8 @@ export default function AdminDashboard() {
           {/* Content Tab Content Area */}
           <div className="rounded-3xl bg-white p-8 shadow-sm border border-slate-100/80">
             {/* Tab 1: Overview */}
-            {activeTab === "overview" && stats && (
+            {activeTab === "overview" && (
+              stats ? (
               <div className="space-y-8 animate-fade-in">
                 <div>
                   <h2 className="text-2xl font-black text-gray-900">Platform Health & Stats</h2>
@@ -673,7 +677,22 @@ export default function AdminDashboard() {
                   </div>
                 )}
               </div>
-            )}
+            ) : statsError ? (
+                  <div className="p-8 text-center bg-red-50/50 border border-red-100 rounded-3xl text-red-700">
+                    <div className="text-4xl mb-3">⚠️</div>
+                    <h3 className="text-lg font-bold">Access Denied / Loading Error</h3>
+                    <p className="mt-2 text-sm text-red-600/80">{statsError}</p>
+                    <p className="mt-4 text-xs text-slate-400 font-mono">
+                      Please make sure your email is added to ADMIN_EMAILS in the '.env' file.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent align-[-0.125em]"></div>
+                    <div className="text-sm font-semibold text-slate-500 mt-4">Loading stats...</div>
+                  </div>
+                )
+              )}
 
             {/* Tab 2: Users Management */}
             {activeTab === "users" && (
