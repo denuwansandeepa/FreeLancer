@@ -109,21 +109,21 @@ export default function ClientView({ postedJobs, sentHireRequests, onManageReque
         </div>
       </div>
 
-      {/* Sent Hire Requests Panel */}
+      {/* Applications & Hire Requests Panel */}
       <div className="rounded-3xl bg-white p-8 shadow-sm">
         <div>
           <h2 className="text-2xl font-black text-gray-900">
-            Direct Hire Requests Sent
+            Applications & Hire Requests
           </h2>
           <p className="mt-1 text-gray-600">
-            Track direct hire requests you have sent to freelancers.
+            Review job applications and track direct hire requests.
           </p>
         </div>
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200">
           {activeHires.length === 0 ? (
             <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-              <p className="text-gray-500 font-medium">You haven't sent any direct hire requests yet.</p>
+              <p className="text-gray-500 font-medium">No job applications or hire requests yet.</p>
               <Link
                 href="/services"
                 className="mt-3 inline-block rounded-full bg-blue-600 px-6 py-2.5 text-xs font-bold text-white hover:bg-blue-700 transition cursor-pointer"
@@ -136,7 +136,7 @@ export default function ClientView({ postedJobs, sentHireRequests, onManageReque
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
                   <th className="px-5 py-4">Freelancer</th>
-                  <th className="px-5 py-4">Service</th>
+                  <th className="px-5 py-4">Service / Job</th>
                   <th className="px-5 py-4">Budget</th>
                   <th className="px-5 py-4">Status</th>
                   <th className="px-5 py-4 text-right">Action</th>
@@ -158,7 +158,7 @@ export default function ClientView({ postedJobs, sentHireRequests, onManageReque
                           req.status === "COMPLETED"
                             ? "bg-emerald-50 text-emerald-700"
                             : req.status === "ACCEPTED"
-                            ? "bg-blue-50 text-blue-700"
+                            ? "bg-emerald-50 text-emerald-700"
                             : req.status === "REJECTED"
                             ? "bg-red-50 text-red-700"
                             : "bg-yellow-50 text-yellow-700 font-bold"

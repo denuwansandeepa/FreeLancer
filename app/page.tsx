@@ -29,8 +29,7 @@ export default async function Home() {
     const avgRating =
       reviews.length > 0
         ? (
-            reviews.reduce((acc, curr) => acc + curr.rating, 0) /
-            reviews.length
+            reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length
           ).toFixed(1)
         : "5.0";
 
@@ -341,7 +340,7 @@ export default async function Home() {
             </Link>
 
             <Link
-              href="/services"
+              href="/post-job"
               className="rounded-full border border-white/20 bg-white/10 px-8 py-4 font-black text-white backdrop-blur transition hover:-translate-y-1 hover:bg-white/15"
             >
               Post Job

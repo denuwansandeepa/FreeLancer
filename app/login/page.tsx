@@ -48,8 +48,19 @@ export default function LoginPage() {
 
       setMessage("Login successful. Redirecting...");
 
+      let redirectUrl = "/dashboard";
+      if (data.user?.role === "ADMIN") {
+        redirectUrl = "/admin";
+      } else if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const redirectParam = params.get("redirect");
+        if (redirectParam) {
+          redirectUrl = redirectParam;
+        }
+      }
+
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        window.location.href = redirectUrl;
       }, 800);
     } catch {
       setMessage("Something went wrong. Please try again.");

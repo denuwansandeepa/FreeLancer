@@ -53,22 +53,15 @@ export default function Navbar() {
           return;
         }
 
-        const savedUser = localStorage.getItem("skillLankaUser");
-
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
-        }
+        localStorage.removeItem("skillLankaUser");
+        setUser(null);
       } catch {
-        const savedUser = localStorage.getItem("skillLankaUser");
-
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
-        }
+        localStorage.removeItem("skillLankaUser");
+        setUser(null);
       } finally {
         setCheckingUser(false);
       }
     }
-
     checkLoginUser();
   }, []);
 
@@ -104,52 +97,22 @@ export default function Navbar() {
       setNotifications([
         {
           id: "f1",
-          text:
-            language === "si"
-              ? "ඔබට නව කුලියට ගැනීමේ ඉල්ලීමක් ලැබී ඇත."
-              : language === "ta"
-              ? "உங்களுக்கு புதிய பணியமர்த்தல் கோரிக்கை வந்துள்ளது."
-              : "New hire request received from a client.",
-          time:
-            language === "si"
-              ? "මිනිත්තු 5කට පෙර"
-              : language === "ta"
-              ? "5 நிமிடங்களுக்கு முன்"
-              : "5 mins ago",
+          text: "New hire request received from Saman Enterprises.",
+          time: "5 mins ago",
           read: false,
           link: "/dashboard",
         },
         {
           id: "f2",
-          text:
-            language === "si"
-              ? "සේවාදායකයෙක් ඔබගේ සේවා යෝජනාව පිළිගෙන ඇත."
-              : language === "ta"
-              ? "ஒரு வாடிக்கையாளர் உங்கள் சேவை சலுகையை ஏற்றுக்கொண்டார்."
-              : "Client accepted your custom service offer.",
-          time:
-            language === "si"
-              ? "පැය 1කට පෙර"
-              : language === "ta"
-              ? "1 மணி நேரத்திற்கு முன்"
-              : "1 hour ago",
+          text: "Client accepted your custom service offer.",
+          time: "1 hour ago",
           read: false,
           link: "/dashboard",
         },
         {
           id: "f3",
-          text:
-            language === "si"
-              ? "ඔබගේ නිදහස් සේවක පැතිකඩ යාවත්කාලීන කර ඇත."
-              : language === "ta"
-              ? "உங்கள் சுயதொழிலாளர் சுயவிவரம் புதுப்பிக்கப்பட்டது."
-              : "You successfully updated your freelancer profile.",
-          time:
-            language === "si"
-              ? "පැය 2කට පෙර"
-              : language === "ta"
-              ? "2 மணி நேரத்திற்கு முன்"
-              : "2 hours ago",
+          text: "You successfully updated your freelancer profile.",
+          time: "2 hours ago",
           read: true,
           link: "/dashboard",
         },
@@ -158,41 +121,28 @@ export default function Navbar() {
       setNotifications([
         {
           id: "c1",
-          text:
-            language === "si"
-              ? "ඔබගේ රැකියා ඉල්ලීමට අයදුම්පත් ලැබී ඇත."
-              : language === "ta"
-              ? "உங்கள் வேலை கோரிக்கைக்கு விண்ணப்பங்கள் வந்துள்ளன."
-              : "Your job request has received applications.",
-          time:
-            language === "si"
-              ? "පැය 3කට පෙර"
-              : language === "ta"
-              ? "3 மணி நேரத்திற்கு முன்"
-              : "3 hours ago",
+          text: "Sandeepa updated their freelancer location to Colombo.",
+          time: "10 mins ago",
+          read: false,
+          link: "/freelancers",
+        },
+        {
+          id: "c2",
+          text: "Your job request has received 3 applications.",
+          time: "3 hours ago",
           read: false,
           link: "/jobs",
         },
         {
-          id: "c2",
-          text:
-            language === "si"
-              ? "නිදහස් සේවකයෙක් ඔබගේ ආරාධනය පිළිගෙන ඇත."
-              : language === "ta"
-              ? "ஒரு சுயதொழிலாளர் உங்கள் அழைப்பை ஏற்றுக்கொண்டார்."
-              : "A freelancer accepted your invitation.",
-          time:
-            language === "si"
-              ? "පැය 5කට පෙර"
-              : language === "ta"
-              ? "5 மணி நேரத்திற்கு முன்"
-              : "5 hours ago",
+          id: "c3",
+          text: "A freelancer accepted your invitation to interview.",
+          time: "5 hours ago",
           read: true,
           link: "/dashboard",
         },
       ]);
     }
-  }, [user, language]);
+  }, [user]);
 
   async function handleLogout() {
     try {
@@ -206,6 +156,7 @@ export default function Navbar() {
 
     localStorage.removeItem("skillLankaUser");
     setUser(null);
+    setNotifications([]);
     setMobileOpen(false);
     router.push("/login");
     router.refresh();
@@ -230,7 +181,17 @@ export default function Navbar() {
     }
   }
 
-  function handleNotificationClick(notification: NotificationItem) {
+  async function handleNotificationClick(notification: NotificationItem) {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationId: notification.id }),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
     setNotifications((prev) =>
       prev.map((item) =>
         item.id === notification.id ? { ...item, read: true } : item
@@ -241,7 +202,17 @@ export default function Navbar() {
     router.push(notification.link);
   }
 
-  function markAllAsRead() {
+  async function markAllAsRead() {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
     setNotifications((prev) =>
       prev.map((item) => ({
         ...item,
@@ -305,7 +276,7 @@ export default function Navbar() {
             </Link>
 
             <Link href="/jobs" className={navLinkClass("/jobs")}>
-              {t.jobs}
+              Jobs
             </Link>
 
             {user?.role !== "FREELANCER" && (
@@ -324,7 +295,7 @@ export default function Navbar() {
 
             <Link
               href="/dashboard"
-              onClick={(event) => handleNavClick(event, t.dashboard)}
+              onClick={(event) => handleNavClick(event, "Dashboard")}
               className={navLinkClass("/dashboard")}
             >
               {t.dashboard}
@@ -425,7 +396,7 @@ export default function Navbar() {
                 </div>
 
                 <Link
-                  href="/dashboard"
+                  href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
                   className="group flex items-center gap-3 rounded-full border border-blue-100 bg-blue-50 py-2 pl-2 pr-5 shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-100 hover:shadow-lg"
                 >
                   <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-600 to-emerald-400 text-sm font-black uppercase text-white shadow-md">
@@ -445,7 +416,7 @@ export default function Navbar() {
                       Hi, {user.name.split(" ")[0]}
                     </p>
                     <p className="text-[11px] font-bold text-slate-500">
-                      {user.role === "FREELANCER" ? t.freelancer : t.client}
+                      {user.role === "FREELANCER" ? "Freelancer" : "Client"}
                     </p>
                   </div>
                 </Link>
@@ -506,7 +477,7 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
               >
-                {t.jobs}
+                Jobs
               </Link>
 
               {user?.role !== "FREELANCER" && (
@@ -529,7 +500,7 @@ export default function Navbar() {
 
               <Link
                 href="/dashboard"
-                onClick={(event) => handleNavClick(event, t.dashboard)}
+                onClick={(event) => handleNavClick(event, "Dashboard")}
                 className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
               >
                 {t.dashboard}
@@ -540,7 +511,7 @@ export default function Navbar() {
               {user ? (
                 <div className="grid gap-3">
                   <Link
-                    href="/dashboard"
+                    href={user.role === "ADMIN" ? "/admin" : "/dashboard"}
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-3 rounded-2xl bg-blue-50 p-3"
                   >

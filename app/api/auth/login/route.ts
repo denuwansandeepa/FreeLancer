@@ -16,7 +16,7 @@ export async function POST(request: Request) {
           success: false,
           message: "Email and password are required.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
           success: false,
           message: "Invalid email or password.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
           success: false,
           message: "Invalid email or password.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
         message: "Something went wrong while logging in.",
         error: String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

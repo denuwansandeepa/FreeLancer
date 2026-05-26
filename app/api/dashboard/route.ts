@@ -49,9 +49,15 @@ export async function GET() {
           service: {
             select: { title: true },
           },
+          jobRequest: {
+            select: { title: true },
+          },
         },
         orderBy: { createdAt: "desc" },
       });
+
+      const directHiresCount = hireRequests.filter((r) => !r.jobRequestId).length;
+      const jobApplicationsCount = hireRequests.filter((r) => !!r.jobRequestId).length;
 
       return NextResponse.json({
         success: true,
@@ -65,9 +71,15 @@ export async function GET() {
           },
           {
             title: "Hire Requests",
-            value: hireRequests.length.toString(),
-            change: "New requests",
+            value: directHiresCount.toString(),
+            change: "Direct hires",
             icon: "📩",
+          },
+          {
+            title: "Job Applications",
+            value: jobApplicationsCount.toString(),
+            change: "Applied jobs",
+            icon: "📋",
           },
           {
             title: "Active Services",
@@ -75,19 +87,14 @@ export async function GET() {
             change: "Featured",
             icon: "💼",
           },
-          {
-            title: "Completed Jobs",
-            value: "0",
-            change: "None yet",
-            icon: "✅",
-          },
         ],
         hireRequests: hireRequests.map((r) => ({
           id: r.id,
           client: r.client.name,
-          service: r.service?.title || "Custom Hire Request",
+          service: r.jobRequest ? r.jobRequest.title : (r.service?.title || "Custom Hire Request"),
           budget: r.budget || "Negotiable",
           status: r.status,
+          jobRequestId: r.jobRequestId,
         })),
         services:
           profile?.services.map((s) => ({
@@ -114,6 +121,9 @@ export async function GET() {
             select: { name: true },
           },
           service: {
+            select: { title: true },
+          },
+          jobRequest: {
             select: { title: true },
           },
         },
@@ -158,10 +168,10 @@ export async function GET() {
           proposals: j.hireRequests.length,
           status: j.status,
         })),
-        sentHireRequests: sentHireRequests.map((r) => ({
+        sentHireRequests: sentHireRequests.map((r: any) => ({
           id: r.id,
           freelancer: r.freelancer.name,
-          service: r.service?.title || "Direct Hire Request",
+          service: r.jobRequest ? `Application: ${r.jobRequest.title}` : (r.service?.title || "Direct Hire Request"),
           budget: r.budget || "Negotiable",
           status: r.status,
         })),

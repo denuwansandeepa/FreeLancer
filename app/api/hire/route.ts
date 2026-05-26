@@ -10,8 +10,11 @@ export async function POST(request: Request) {
 
     if (!token) {
       return NextResponse.json(
-        { success: false, message: "Unauthorized: Please log in to hire freelancers" },
-        { status: 401 }
+        {
+          success: false,
+          message: "Unauthorized: Please log in to hire freelancers",
+        },
+        { status: 401 },
       );
     }
 
@@ -25,14 +28,14 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json(
         { success: false, message: "User not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (user.role !== "CLIENT") {
       return NextResponse.json(
         { success: false, message: "Only clients can hire freelancers." },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -53,7 +56,7 @@ export async function POST(request: Request) {
       if (!service) {
         return NextResponse.json(
           { success: false, message: "Service not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
       freelancerId = service.freelancerProfile.userId;
@@ -65,21 +68,21 @@ export async function POST(request: Request) {
       if (!profile) {
         return NextResponse.json(
           { success: false, message: "Freelancer profile not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
       freelancerId = profile.userId;
     } else {
       return NextResponse.json(
         { success: false, message: "Missing serviceId or freelancerProfileId" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (clientId === freelancerId) {
       return NextResponse.json(
         { success: false, message: "You cannot hire yourself" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,6 +98,15 @@ export async function POST(request: Request) {
       },
     });
 
+    // Create notification for the freelancer
+    await prisma.notification.create({
+      data: {
+        userId: freelancerId,
+        text: `New hire request received from ${user.name}.`,
+        link: `/dashboard?requestId=${hireRequest.id}`,
+      },
+    });
+
     return NextResponse.json({
       success: true,
       message: "Hire request sent successfully!",
@@ -107,7 +119,7 @@ export async function POST(request: Request) {
         message: "Failed to create hire request.",
         error: String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

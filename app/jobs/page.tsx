@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-
-
+import Footer from "../components/Footer";
+import ApplyJobModal from "../components/ApplyJobModal";
+import { useRouter } from "next/navigation";
 type JobRequest = {
   id: string;
   title: string;
@@ -25,6 +26,9 @@ type JobRequest = {
 };
 
 export default function JobsPage() {
+  const router = useRouter();
+  const [errorJobId, setErrorJobId] = useState<string | null>(null);
+
   const [jobRequests, setJobRequests] = useState<JobRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,6 +36,9 @@ export default function JobsPage() {
   const [category, setCategory] = useState("All Categories");
   const [location, setLocation] = useState("All Locations");
   const [userRole, setUserRole] = useState<string | null>(null);
+
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("skillLankaUser");
@@ -258,6 +265,11 @@ export default function JobsPage() {
                       ))}
                     </div>
                   )}
+                  {errorJobId === job.id && (
+                    <p className=" mt-3 mb-3 text-xs font-black text-red-600 animate-pulse">
+                      ⚠️ To get a job, you need a freelancer Account.
+                    </p>
+                  )}
 
                   <div className="mt-5 grid grid-cols-2 gap-3 border-t pt-5 text-sm">
                     <div className="rounded-2xl bg-gray-50 p-3">
@@ -275,9 +287,29 @@ export default function JobsPage() {
                     </div>
                   </div>
 
-                  {userRole === "FREELANCER" && (
-                    <button className="mt-5 block w-full rounded-full bg-gray-900 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-blue-600">
-                      Send Offer
+                  {(userRole === "FREELANCER" || !userRole) && (
+                    <button
+                      onClick={() => {
+                        // user not login showing message and navigate to login page
+                        if (!userRole) {
+                          setErrorJobId(job.id);
+
+                          setTimeout(() => {
+                            router.push("/login");
+                          }, 5000);
+                          return;
+                        }
+                        setSelectedJob({
+                          id: job.id,
+                          title: job.title,
+                          budget: job.budget,
+                          clientName: job.client?.name || "Client",
+                        });
+                        setIsApplyModalOpen(true);
+                      }}
+                      className="mt-5 block w-full rounded-full bg-gray-900 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-blue-600"
+                    >
+                      Get Job
                     </button>
                   )}
                 </div>
@@ -287,7 +319,16 @@ export default function JobsPage() {
         )}
       </section>
 
-     
+      <ApplyJobModal
+        isOpen={isApplyModalOpen}
+        onClose={() => {
+          setIsApplyModalOpen(false);
+          setSelectedJob(null);
+        }}
+        job={selectedJob}
+      />
+
+      <Footer />
     </main>
   );
 }

@@ -125,13 +125,15 @@ export default function HireModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm md:p-10"
+      className="fixed inset-0 z-[999] overflow-y-auto bg-slate-950/70 backdrop-blur-md"
       onClick={handleClose}
     >
-      <div
-        className="relative z-10 my-auto flex w-full max-w-lg flex-col rounded-3xl border border-gray-100 bg-white p-8 text-left shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
+      <div className="flex min-h-full items-center justify-center p-4 sm:p-10">
+        <div
+          className="relative w-full max-w-lg transform rounded-[2rem] border border-white/20 bg-white p-8 text-left shadow-[0_30px_90px_rgba(15,23,42,0.35)]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close Button */}
         <button
           type="button"
           onClick={handleClose}
@@ -238,6 +240,7 @@ export default function HireModal({
             </div>
           </form>
         )}
+      </div>
       </div>
     </div>
   );

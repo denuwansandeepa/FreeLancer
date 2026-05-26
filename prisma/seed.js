@@ -61,6 +61,20 @@ async function main() {
     },
   });
 
+  // Create a test Admin user
+  console.log("Creating test admin user...");
+  await prisma.user.create({
+    data: {
+      id: "test-admin",
+      name: "System Admin",
+      email: "admin@test.com",
+      password: hashedPassword, // "123456"
+      role: "ADMIN",
+      location: "Colombo",
+      phone: "+94770000000",
+    },
+  });
+
   // 2. Create Freelancer and Profile
   console.log("Creating real freelancer profile...");
   for (const f of freelancersMock) {

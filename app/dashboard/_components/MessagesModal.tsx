@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface MessagesModalProps {
@@ -13,6 +14,7 @@ export default function MessagesModal({
   onClose,
   role,
 }: MessagesModalProps) {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
@@ -28,63 +30,88 @@ export default function MessagesModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    if (role === "FREELANCER") {
-      setNotifications([
-        {
-          id: "f1",
-          text: "New hire request received from Saman Enterprises.",
-          time: "5 mins ago",
-          read: false,
-        },
-        {
-          id: "f2",
-          text: "Client accepted your custom service offer.",
-          time: "1 hour ago",
-          read: false,
-        },
-        {
-          id: "f3",
-          text: "You successfully updated your freelancer profile.",
-          time: "2 hours ago",
-          read: true,
-        },
-      ]);
-    } else {
-      setNotifications([
-        {
-          id: "c1",
-          text: "Sandeepa (Freelancer) updated their location to Colombo.",
-          time: "10 mins ago",
-          read: false,
-        },
-        {
-          id: "c2",
-          text: "Your job request has received 3 applications.",
-          time: "3 hours ago",
-          read: false,
-        },
-        {
-          id: "c3",
-          text: "heshitha (Freelancer) accepted your invitation to interview.",
-          time: "5 hours ago",
-          read: true,
-        },
-      ]);
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    function formatTimeAgo(dateString: string) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+      if (seconds < 60) return "Just now";
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes} min${minutes > 1 ? "s" : ""} ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+      const days = Math.floor(hours / 24);
+      return `${days} day${days > 1 ? "s" : ""} ago`;
     }
-  }, [isOpen, role]);
+
+    async function fetchNotifications() {
+      try {
+        const res = await fetch("/api/notifications", { signal });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && !signal.aborted) {
+          const formatted = data.notifications.map((n: any) => ({
+            id: n.id,
+            text: n.text,
+            link: n.link,
+            read: n.read,
+            time: formatTimeAgo(n.createdAt),
+          }));
+          setNotifications(formatted);
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        if (err instanceof TypeError && err.message === "Failed to fetch") {
+          console.warn("Failed to fetch notifications (server may be offline or restarting).");
+        } else {
+          console.error("Error fetching notifications:", err);
+        }
+      }
+    }
+
+    fetchNotifications();
+
+    return () => {
+      controller.abort();
+    };
+  }, [isOpen]);
 
   const handleClose = () => {
     onClose();
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+    } catch (err) {
+      console.error(err);
+    }
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
-  const handleItemClick = (id: string) => {
+  const handleItemClick = async (id: string, link: string) => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationId: id }),
+      });
+    } catch (err) {
+      console.error(err);
+    }
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
+    router.push(link);
+    onClose();
   };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -137,7 +164,7 @@ export default function MessagesModal({
             notifications.map((notification) => (
               <div
                 key={notification.id}
-                onClick={() => handleItemClick(notification.id)}
+                onClick={() => handleItemClick(notification.id, notification.link)}
                 className={`p-4 rounded-2xl cursor-pointer border transition-all ${
                   notification.read
                     ? "bg-white hover:bg-gray-50 border-gray-100"

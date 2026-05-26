@@ -6,6 +6,7 @@ type RequestItem = {
   service: string;
   budget: string;
   status: string;
+  jobRequestId?: string | null;
 };
 
 type ServiceItem = {
@@ -56,15 +57,18 @@ export default function FreelancerView({
   const activeRequests = hireRequests || defaultHireRequests;
   const activeServices = services || defaultServices;
 
+  const directHires = activeRequests.filter((r) => !r.jobRequestId);
+  const jobApplications = activeRequests.filter((r) => !!r.jobRequestId);
+
   return (
     <div className="space-y-8">
-      {/* Hire Requests Panel */}
+      {/* Direct Hire Requests Panel */}
       <div className="rounded-3xl bg-white p-8 shadow-sm">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
-            <h2 className="text-2xl font-black text-gray-900">Hire Requests</h2>
+            <h2 className="text-2xl font-black text-gray-900">Direct Hire Requests</h2>
             <p className="mt-1 text-gray-600">
-              Review clients who want to hire you.
+              Review clients who want to hire you directly for your services.
             </p>
           </div>
           <button className="rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700 cursor-pointer">
@@ -84,36 +88,122 @@ export default function FreelancerView({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {activeRequests.length === 0 ? (
+              {directHires.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-8 text-center text-gray-500">
-                    No hire requests yet.
+                    No direct hire requests yet.
                   </td>
                 </tr>
               ) : (
-                activeRequests.map((request, index) => (
+                directHires.map((request, index) => (
                   <tr key={`${request.client}-${index}`} className="bg-white">
                     <td className="px-5 py-4 font-bold text-gray-900">
                       {request.client}
                     </td>
-                    <td className="px-5 py-4 text-gray-600">{request.service}</td>
+                    <td className="px-5 py-4 text-gray-600">
+                      {request.service}
+                    </td>
                     <td className="px-5 py-4 font-bold text-gray-900">
                       {request.budget}
                     </td>
                     <td className="px-5 py-4">
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        request.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                        request.status === 'ACCEPTED' ? 'bg-blue-50 text-blue-700' :
-                        request.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          request.status === "PENDING"
+                            ? "bg-yellow-50 text-yellow-700"
+                            : request.status === "ACCEPTED"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : request.status === "COMPLETED"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
                         {request.status}
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
                       <button
-                        onClick={() => onManageRequest && onManageRequest(request.id)}
-                        className="text-blue-600 font-bold hover:underline"
+                        onClick={() =>
+                          onManageRequest && onManageRequest(request.id)
+                        }
+                        className="text-blue-600 font-bold hover:underline cursor-pointer"
+                      >
+                        Manage
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Job Applications Panel */}
+      <div className="rounded-3xl bg-white p-8 shadow-sm">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h2 className="text-2xl font-black text-gray-900">Job Applications</h2>
+            <p className="mt-1 text-gray-600">
+              Track and manage job applications you have submitted to client job posts.
+            </p>
+          </div>
+          <button className="rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700 cursor-pointer">
+            View All
+          </button>
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-gray-50 text-gray-600">
+              <tr>
+                <th className="px-5 py-4">Client</th>
+                <th className="px-5 py-4">Job Title</th>
+                <th className="px-5 py-4">Proposed Budget</th>
+                <th className="px-5 py-4">Status</th>
+                <th className="px-5 py-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {jobApplications.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
+                    No job applications yet.
+                  </td>
+                </tr>
+              ) : (
+                jobApplications.map((request, index) => (
+                  <tr key={`${request.client}-${index}`} className="bg-white">
+                    <td className="px-5 py-4 font-bold text-gray-900">
+                      {request.client}
+                    </td>
+                    <td className="px-5 py-4 text-gray-600">
+                      {request.service}
+                    </td>
+                    <td className="px-5 py-4 font-bold text-gray-900">
+                      {request.budget}
+                    </td>
+                    <td className="px-5 py-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          request.status === "PENDING"
+                            ? "bg-yellow-50 text-yellow-700"
+                            : request.status === "ACCEPTED"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : request.status === "COMPLETED"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {request.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <button
+                        onClick={() =>
+                          onManageRequest && onManageRequest(request.id)
+                        }
+                        className="text-blue-600 font-bold hover:underline cursor-pointer"
                       >
                         Manage
                       </button>
@@ -146,7 +236,9 @@ export default function FreelancerView({
         <div className="mt-6 grid gap-4">
           {activeServices.length === 0 ? (
             <div className="text-center py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-              <p className="text-gray-500">You haven't listed any services yet.</p>
+              <p className="text-gray-500">
+                You haven't listed any services yet.
+              </p>
               <button
                 onClick={onAddServiceClick}
                 className="mt-3 text-blue-600 font-bold hover:underline"
