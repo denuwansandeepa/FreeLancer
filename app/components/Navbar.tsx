@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { MouseEvent, useEffect, useState } from "react";
+import { useLanguage } from "./LanguageProvider";
 
 type LoggedInUser = {
   id: string;
@@ -25,6 +26,7 @@ type NotificationItem = {
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
+  const { language, setLanguage, t } = useLanguage();
 
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [checkingUser, setCheckingUser] = useState(true);
@@ -102,22 +104,52 @@ export default function Navbar() {
       setNotifications([
         {
           id: "f1",
-          text: "New hire request received from Saman Enterprises.",
-          time: "5 mins ago",
+          text:
+            language === "si"
+              ? "ඔබට නව කුලියට ගැනීමේ ඉල්ලීමක් ලැබී ඇත."
+              : language === "ta"
+              ? "உங்களுக்கு புதிய பணியமர்த்தல் கோரிக்கை வந்துள்ளது."
+              : "New hire request received from a client.",
+          time:
+            language === "si"
+              ? "මිනිත්තු 5කට පෙර"
+              : language === "ta"
+              ? "5 நிமிடங்களுக்கு முன்"
+              : "5 mins ago",
           read: false,
           link: "/dashboard",
         },
         {
           id: "f2",
-          text: "Client accepted your custom service offer.",
-          time: "1 hour ago",
+          text:
+            language === "si"
+              ? "සේවාදායකයෙක් ඔබගේ සේවා යෝජනාව පිළිගෙන ඇත."
+              : language === "ta"
+              ? "ஒரு வாடிக்கையாளர் உங்கள் சேவை சலுகையை ஏற்றுக்கொண்டார்."
+              : "Client accepted your custom service offer.",
+          time:
+            language === "si"
+              ? "පැය 1කට පෙර"
+              : language === "ta"
+              ? "1 மணி நேரத்திற்கு முன்"
+              : "1 hour ago",
           read: false,
           link: "/dashboard",
         },
         {
           id: "f3",
-          text: "You successfully updated your freelancer profile.",
-          time: "2 hours ago",
+          text:
+            language === "si"
+              ? "ඔබගේ නිදහස් සේවක පැතිකඩ යාවත්කාලීන කර ඇත."
+              : language === "ta"
+              ? "உங்கள் சுயதொழிலாளர் சுயவிவரம் புதுப்பிக்கப்பட்டது."
+              : "You successfully updated your freelancer profile.",
+          time:
+            language === "si"
+              ? "පැය 2කට පෙර"
+              : language === "ta"
+              ? "2 மணி நேரத்திற்கு முன்"
+              : "2 hours ago",
           read: true,
           link: "/dashboard",
         },
@@ -126,28 +158,41 @@ export default function Navbar() {
       setNotifications([
         {
           id: "c1",
-          text: "Sandeepa updated their freelancer location to Colombo.",
-          time: "10 mins ago",
-          read: false,
-          link: "/freelancers",
-        },
-        {
-          id: "c2",
-          text: "Your job request has received 3 applications.",
-          time: "3 hours ago",
+          text:
+            language === "si"
+              ? "ඔබගේ රැකියා ඉල්ලීමට අයදුම්පත් ලැබී ඇත."
+              : language === "ta"
+              ? "உங்கள் வேலை கோரிக்கைக்கு விண்ணப்பங்கள் வந்துள்ளன."
+              : "Your job request has received applications.",
+          time:
+            language === "si"
+              ? "පැය 3කට පෙර"
+              : language === "ta"
+              ? "3 மணி நேரத்திற்கு முன்"
+              : "3 hours ago",
           read: false,
           link: "/jobs",
         },
         {
-          id: "c3",
-          text: "A freelancer accepted your invitation to interview.",
-          time: "5 hours ago",
+          id: "c2",
+          text:
+            language === "si"
+              ? "නිදහස් සේවකයෙක් ඔබගේ ආරාධනය පිළිගෙන ඇත."
+              : language === "ta"
+              ? "ஒரு சுயதொழிலாளர் உங்கள் அழைப்பை ஏற்றுக்கொண்டார்."
+              : "A freelancer accepted your invitation.",
+          time:
+            language === "si"
+              ? "පැය 5කට පෙර"
+              : language === "ta"
+              ? "5 மணி நேரத்திற்கு முன்"
+              : "5 hours ago",
           read: true,
           link: "/dashboard",
         },
       ]);
     }
-  }, [user]);
+  }, [user, language]);
 
   async function handleLogout() {
     try {
@@ -156,7 +201,7 @@ export default function Navbar() {
         credentials: "include",
       });
     } catch {
-      // Ignore logout API error for now.
+      // ignore logout API error
     }
 
     localStorage.removeItem("skillLankaUser");
@@ -166,7 +211,10 @@ export default function Navbar() {
     router.refresh();
   }
 
-  function handleNavClick(event: MouseEvent<HTMLAnchorElement>, label: string) {
+  function handleNavClick(
+    event: MouseEvent<HTMLAnchorElement>,
+    label: string
+  ) {
     if (!user && !checkingUser) {
       event.preventDefault();
       setModalTarget(label);
@@ -175,7 +223,7 @@ export default function Navbar() {
       return;
     }
 
-    if (user && user.role !== "CLIENT" && label === "Post Job") {
+    if (user && user.role !== "CLIENT" && label === t.postJob) {
       event.preventDefault();
       setShowRoleModal(true);
       setMobileOpen(false);
@@ -185,8 +233,8 @@ export default function Navbar() {
   function handleNotificationClick(notification: NotificationItem) {
     setNotifications((prev) =>
       prev.map((item) =>
-        item.id === notification.id ? { ...item, read: true } : item,
-      ),
+        item.id === notification.id ? { ...item, read: true } : item
+      )
     );
 
     setShowNotifications(false);
@@ -198,7 +246,7 @@ export default function Navbar() {
       prev.map((item) => ({
         ...item,
         read: true,
-      })),
+      }))
     );
   }
 
@@ -212,6 +260,22 @@ export default function Navbar() {
     isActiveLink(href)
       ? "rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2.5 text-sm font-black text-white shadow-[0_12px_28px_rgba(37,99,235,0.35)]"
       : "rounded-full px-5 py-2.5 text-sm font-bold text-slate-600 transition hover:-translate-y-0.5 hover:bg-white hover:text-blue-600 hover:shadow-md";
+
+  function LanguageSelector() {
+    return (
+      <select
+        value={language}
+        onChange={(event) =>
+          setLanguage(event.target.value as "en" | "si" | "ta")
+        }
+        className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 shadow-sm outline-none transition hover:bg-slate-50"
+      >
+        <option value="en">English</option>
+        <option value="si">සිංහල</option>
+        <option value="ta">தமிழ்</option>
+      </select>
+    );
+  }
 
   return (
     <>
@@ -237,37 +301,39 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-1 rounded-full border border-slate-200/80 bg-slate-50/80 p-1.5 shadow-inner shadow-slate-200/70 backdrop-blur-xl md:flex">
             <Link href="/freelancers" className={navLinkClass("/freelancers")}>
-              Find Freelancers
+              {t.findFreelancers}
             </Link>
 
             <Link href="/jobs" className={navLinkClass("/jobs")}>
-              Jobs
+              {t.jobs}
             </Link>
 
             {user?.role !== "FREELANCER" && (
               <Link
                 href="/post-job"
-                onClick={(event) => handleNavClick(event, "Post Job")}
+                onClick={(event) => handleNavClick(event, t.postJob)}
                 className={navLinkClass("/post-job")}
               >
-                Post Job
+                {t.postJob}
               </Link>
             )}
 
             <Link href="/services" className={navLinkClass("/services")}>
-              Services
+              {t.services}
             </Link>
 
             <Link
               href="/dashboard"
-              onClick={(event) => handleNavClick(event, "Dashboard")}
+              onClick={(event) => handleNavClick(event, t.dashboard)}
               className={navLinkClass("/dashboard")}
             >
-              Dashboard
+              {t.dashboard}
             </Link>
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
+            <LanguageSelector />
+
             {checkingUser ? (
               <div className="h-12 w-44 animate-pulse rounded-full bg-slate-100"></div>
             ) : user ? (
@@ -303,14 +369,14 @@ export default function Navbar() {
                   </button>
 
                   {showNotifications && (
-                    <div className="absolute right-0 mt-4 w-88 max-w-[90vw] overflow-hidden rounded-[1.8rem] border border-slate-100 bg-white p-5 shadow-[0_30px_80px_rgba(15,23,42,0.2)]">
+                    <div className="absolute right-0 mt-4 w-80 max-w-[90vw] overflow-hidden rounded-[1.8rem] border border-slate-100 bg-white p-5 shadow-[0_30px_80px_rgba(15,23,42,0.2)]">
                       <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
                         <div>
                           <h3 className="font-black text-slate-950">
-                            Notifications
+                            {t.notifications}
                           </h3>
                           <p className="text-xs font-semibold text-slate-400">
-                            {unreadCount} unread updates
+                            {unreadCount} unread
                           </p>
                         </div>
 
@@ -320,7 +386,7 @@ export default function Navbar() {
                             onClick={markAllAsRead}
                             className="text-xs font-black text-blue-600 hover:text-blue-700"
                           >
-                            Mark all read
+                            {t.markAllRead}
                           </button>
                         )}
                       </div>
@@ -328,7 +394,7 @@ export default function Navbar() {
                       <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
                         {notifications.length === 0 ? (
                           <p className="py-6 text-center text-sm text-slate-500">
-                            No notifications yet
+                            {t.noNotifications}
                           </p>
                         ) : (
                           notifications.map((notification) => (
@@ -379,7 +445,7 @@ export default function Navbar() {
                       Hi, {user.name.split(" ")[0]}
                     </p>
                     <p className="text-[11px] font-bold text-slate-500">
-                      {user.role === "FREELANCER" ? "Freelancer" : "Client"}
+                      {user.role === "FREELANCER" ? t.freelancer : t.client}
                     </p>
                   </div>
                 </Link>
@@ -389,7 +455,7 @@ export default function Navbar() {
                   onClick={handleLogout}
                   className="rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-[0_12px_28px_rgba(15,23,42,0.24)] transition hover:-translate-y-0.5 hover:bg-red-600 hover:shadow-red-500/25"
                 >
-                  Logout
+                  {t.logout}
                 </button>
               </>
             ) : (
@@ -398,14 +464,14 @@ export default function Navbar() {
                   href="/login"
                   className="rounded-full px-5 py-3 text-sm font-black text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-100 hover:text-blue-600"
                 >
-                  Login
+                  {t.login}
                 </Link>
 
                 <Link
                   href="/register"
                   className="rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-3 text-sm font-black text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:-translate-y-0.5 hover:shadow-blue-500/40"
                 >
-                  Join Now
+                  {t.joinNow}
                 </Link>
               </>
             )}
@@ -422,13 +488,17 @@ export default function Navbar() {
 
         {mobileOpen && (
           <div className="border-t border-slate-100 bg-white/95 px-5 py-5 shadow-2xl backdrop-blur-xl md:hidden">
+            <div className="mb-4">
+              <LanguageSelector />
+            </div>
+
             <div className="grid gap-2">
               <Link
                 href="/freelancers"
                 onClick={() => setMobileOpen(false)}
                 className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
               >
-                Find Freelancers
+                {t.findFreelancers}
               </Link>
 
               <Link
@@ -436,16 +506,16 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
               >
-                Jobs
+                {t.jobs}
               </Link>
 
               {user?.role !== "FREELANCER" && (
                 <Link
                   href="/post-job"
-                  onClick={(event) => handleNavClick(event, "Post Job")}
+                  onClick={(event) => handleNavClick(event, t.postJob)}
                   className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
                 >
-                  Post Job
+                  {t.postJob}
                 </Link>
               )}
 
@@ -454,15 +524,15 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
               >
-                Services
+                {t.services}
               </Link>
 
               <Link
                 href="/dashboard"
-                onClick={(event) => handleNavClick(event, "Dashboard")}
+                onClick={(event) => handleNavClick(event, t.dashboard)}
                 className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-black text-slate-700"
               >
-                Dashboard
+                {t.dashboard}
               </Link>
             </div>
 
@@ -499,7 +569,7 @@ export default function Navbar() {
                     onClick={handleLogout}
                     className="rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white"
                   >
-                    Logout
+                    {t.logout}
                   </button>
                 </div>
               ) : (
@@ -509,7 +579,7 @@ export default function Navbar() {
                     onClick={() => setMobileOpen(false)}
                     className="rounded-2xl bg-slate-100 px-5 py-3 text-center text-sm font-black text-slate-700"
                   >
-                    Login
+                    {t.login}
                   </Link>
 
                   <Link
@@ -517,7 +587,7 @@ export default function Navbar() {
                     onClick={() => setMobileOpen(false)}
                     className="rounded-2xl bg-blue-600 px-5 py-3 text-center text-sm font-black text-white"
                   >
-                    Join Now
+                    {t.joinNow}
                   </Link>
                 </div>
               )}
@@ -548,13 +618,12 @@ export default function Navbar() {
 
             <div className="text-center">
               <h3 className="text-3xl font-black text-slate-950">
-                Login Required
+                {t.loginRequired}
               </h3>
 
               <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-600">
-                You must be logged in to access{" "}
-                <span className="font-black text-blue-600">{modalTarget}</span>.
-                Please login or create an account to continue.
+                {t.loginRequiredText}{" "}
+                <span className="font-black text-blue-600">{modalTarget}</span>
               </p>
             </div>
 
@@ -564,7 +633,7 @@ export default function Navbar() {
                 onClick={() => setShowLoginModal(false)}
                 className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-center text-sm font-black text-white shadow-lg shadow-blue-500/25 hover:-translate-y-0.5"
               >
-                Login
+                {t.login}
               </Link>
 
               <Link
@@ -572,7 +641,7 @@ export default function Navbar() {
                 onClick={() => setShowLoginModal(false)}
                 className="rounded-2xl bg-slate-100 py-4 text-center text-sm font-black text-slate-700 hover:bg-slate-200"
               >
-                Create Account
+                {t.createAccount}
               </Link>
             </div>
           </div>
@@ -601,13 +670,11 @@ export default function Navbar() {
 
             <div className="text-center">
               <h3 className="text-3xl font-black text-slate-950">
-                Client Role Required
+                {t.clientRoleRequired}
               </h3>
 
               <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-600">
-                Only <span className="font-black text-blue-600">Client</span>{" "}
-                accounts can post job requests. Freelancers can apply to jobs
-                but cannot post them.
+                {t.clientRoleText}
               </p>
             </div>
 
@@ -616,7 +683,7 @@ export default function Navbar() {
               onClick={() => setShowRoleModal(false)}
               className="mt-8 w-full rounded-2xl bg-slate-950 py-4 text-sm font-black text-white hover:bg-slate-800"
             >
-              Got it
+              {t.gotIt}
             </button>
           </div>
         </div>

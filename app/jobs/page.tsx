@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import Footer from "../components/Footer";
+
 
 type JobRequest = {
   id: string;
@@ -287,7 +287,7 @@ export default function JobsPage() {
         )}
       </section>
 
-      <Footer />
+     
     </main>
   );
 }
