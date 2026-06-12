@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("CLIENT")
+  phone     String?
+  location  String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  freelancerProfile FreelancerProfile?
+
+  jobRequests          JobRequest[] @relation("ClientJobRequests")
+  sentHireRequests     HireRequest[] @relation("ClientHireRequests")
+  receivedHireRequests HireRequest[] @relation("FreelancerHireRequests")
+
+  writtenReviews  Review[] @relation("ClientReviews")
+  receivedReviews Review[] @relation("FreelancerReviews")
+  notifications   Notification[]
+}
+
+model FreelancerProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  title         String
+  bio           String
+  category      String
+  location      String
+  skills        String
+  experience    String?
+  startingPrice String?
+  responseTime  String?
+  profileImage  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  services Service[]
+}
+
+model Service {
+  id                  String   @id @default(cuid())
+  freelancerProfileId String
+  title               String
+  description         String
+  category            String
+  price               String
+  delivery            String
+  revision            String?
+  tags                String?
+  image               String?
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  freelancerProfile FreelancerProfile @relation(fields: [freelancerProfileId], references: [id], onDelete: Cascade)
+
+  hireRequests HireRequest[]
+  reviews      Review[]
+}
+
+model JobRequest {
+  id          String   @id @default(cuid())
+  clientId    String
+  title       String
+  description String
+  category    String
+  budget      String
+  deadline    String?
+  location    String?
+  skills      String?
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  client User @relation("ClientJobRequests", fields: [clientId], references: [id], onDelete: Cascade)
+
+  hireRequests HireRequest[]
+}
+
+model HireRequest {
+  id           String   @id @default(cuid())
+  clientId     String
+  freelancerId String
+  serviceId    String?
+  jobRequestId String?
+  message      String
+  budget       String?
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  client     User @relation("ClientHireRequests", fields: [clientId], references: [id], onDelete: Cascade)
+  freelancer User @relation("FreelancerHireRequests", fields: [freelancerId], references: [id], onDelete: Cascade)
+
+  service    Service?    @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  jobRequest JobRequest? @relation(fields: [jobRequestId], references: [id], onDelete: SetNull)
+
+  chatMessages ChatMessage[]
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  clientId     String
+  freelancerId String
+  serviceId    String?
+  rating       Int
+  comment      String?
+  createdAt    DateTime @default(now())
+
+  client     User @relation("ClientReviews", fields: [clientId], references: [id], onDelete: Cascade)
+  freelancer User @relation("FreelancerReviews", fields: [freelancerId], references: [id], onDelete: Cascade)
+
+  service Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+}
+
+model ChatMessage {
+  id            String   @id @default(cuid())
+  isRead        Boolean  @default(false)
+  hireRequestId String
+  senderId      String
+  message       String
+  createdAt     DateTime @default(now())
+
+  hireRequest   HireRequest @relation(fields: [hireRequestId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  text      String
+  link      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
