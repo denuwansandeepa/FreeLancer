@@ -72,3 +72,9 @@ Now, open [http://localhost:3000](http://localhost:3000) in your browser to view
 * **Frontend**: Next.js 16 (React 19), TailwindCSS
 * **Backend**: PHP (REST API)
 * **Database**: MySQL, Prisma ORM
+
+---
+
+## 📄 License
+This project is proprietary and closed-source. All rights are reserved. See the [LICENSE](file:///d:/company_Dearo/FreeLancer/LICENSE) file for more details.
+
