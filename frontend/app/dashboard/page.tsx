@@ -50,12 +50,21 @@ export default function DashboardPage() {
         router.push("/login");
         return;
       }
+      if (!res.ok) {
+        console.error("Backend server is not running!");
+        return;
+      }
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error("Backend server is not running!");
+        return;
+      }
       const data = await res.json();
       if (data.success) {
         setDbData(data);
       }
     } catch (err) {
-      console.log("Error loading dashboard data:", err);
+      console.error("Backend server is not running!");
     }
   };
 

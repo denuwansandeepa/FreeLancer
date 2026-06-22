@@ -60,12 +60,23 @@ export default function JobsPage() {
           cache: "no-store",
         });
 
-        const data = await response.json();
-
-        if (response.ok) {
-          setJobRequests(data.jobRequests || []);
+        if (!response.ok) {
+          console.error("Backend server is not running!");
+          setJobRequests([]);
+          return;
         }
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          console.error("Backend server is not running!");
+          setJobRequests([]);
+          return;
+        }
+
+        const data = await response.json();
+        setJobRequests(data.jobRequests || []);
       } catch {
+        console.error("Backend server is not running!");
         setJobRequests([]);
       } finally {
         setLoading(false);

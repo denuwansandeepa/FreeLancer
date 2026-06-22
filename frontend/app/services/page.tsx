@@ -23,12 +23,24 @@ export default function ServicesPage() {
   async function loadServices() {
     try {
       const response = await fetch("/api/services");
+      
+      if (!response.ok) {
+        console.error("Backend server is not running!");
+        return;
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error("Backend server is not running!");
+        return;
+      }
+
       const data = await response.json();
       if (data.success) {
         setServices(data.services);
       }
     } catch (err) {
-      console.error("Error loading services:", err);
+      console.error("Backend server is not running!");
     } finally {
       setLoading(false);
     }

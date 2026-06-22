@@ -15,18 +15,33 @@ export default function FreelancersPage() {
     async function loadFreelancers() {
       try {
         const response = await fetch("/api/freelancers");
+
+        // 1. Check if the response status is not OK (e.g. 500, 502, 504)
+        if (!response.ok) {
+          console.error("Backend server is not running!");
+          return;
+        }
+
+        // 2. Check if the response is actually JSON (proxy error returns HTML/Text)
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          console.error("Backend server is not running!");
+          return;
+        }
+
         const data = await response.json();
         if (data.success) {
           setFreelancers(data.freelancers);
         }
       } catch (err) {
-        console.error("Error loading freelancers:", err);
+        console.error("Backend server is not running!");
       } finally {
         setLoading(false);
       }
     }
     loadFreelancers();
   }, []);
+
 
   const filteredFreelancers = useMemo(() => {
     let result = freelancers.filter((freelancer) => {

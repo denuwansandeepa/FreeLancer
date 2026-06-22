@@ -7,8 +7,8 @@ import { FormEvent, useState } from "react";
 export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("kasun@test.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -113,11 +113,10 @@ export default function LoginPage() {
 
             {message && (
               <div
-                className={`mb-5 rounded-2xl p-4 text-sm font-semibold ${
-                  message.includes("successful")
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-red-50 text-red-700"
-                }`}
+                className={`mb-5 rounded-2xl p-4 text-sm font-semibold ${message.includes("successful")
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "bg-red-50 text-red-700"
+                  }`}
               >
                 {message}
               </div>
